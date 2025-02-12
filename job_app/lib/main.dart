@@ -1,54 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:job_app/home_page.dart';
+import 'package:job_app/themes/app_themes.dart';
 
-void main() {
-  runApp(
-    MyApp(),
-  );
+void main() => runApp(const MyApp());
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class _MyAppState extends State<MyApp> {
+  bool isDarkMode = false;
+
+  void toggleTheme() {
+    setState(() {
+      isDarkMode = !isDarkMode;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 80.0,
-          backgroundColor: Colors.blue[100],
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(
-                Icons.list_sharp,
-                size: 40.0,
-              ),
-              Container(
-                color: Colors.yellow,
-                width: 50.0,
-                height: 50.0,
-              ),
-              Column(
-                children: [
-                  Title(
-                    color: Colors.black,
-                    child: Text(
-                      "Welcome Back!",
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Icon(
-                Icons.notifications,
-                size: 35.0,
-              ),
-            ],
-          ),
-        ),
+      title: 'Flutter Demo',
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      darkTheme: AppTheme.dark,
+      theme: AppTheme.light,
+      home: HomePage(
+        onThemeChanged: toggleTheme,
       ),
     );
   }
