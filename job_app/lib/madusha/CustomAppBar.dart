@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:job_app/madusha/CustomMenuBar.dart';
-import 'package:job_app/madusha/CustomNotification.dart';
+import 'package:job_app/madusha/custommenubar.dart';
+import 'package:job_app/madusha/customnotification.dart';
 
 class CustomAppBar extends StatelessWidget {
   const CustomAppBar({super.key});

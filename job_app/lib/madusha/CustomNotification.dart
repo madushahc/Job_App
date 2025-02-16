@@ -7,16 +7,15 @@ class CustomNotification extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Icon(
-              Icons.close,
-              size: 35.0,
-            ),
-            Text(
-              "Notification",
-            ),
-          ],
+        title: Center(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "Notification",
+              ),
+            ],
+          ),
         ),
       ),
       body: Center(
