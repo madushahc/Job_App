@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:job_app/home_page.dart';
+import 'package:job_app/madusha/customappbar.dart';
 import 'package:job_app/themes/app_themes.dart';
 
 void main() => runApp(const MyApp());
@@ -23,11 +23,13 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       darkTheme: AppTheme.dark,
       theme: AppTheme.light,
-      home: HomePage(
+      home: CustomAppBar(
+        isDarkMode: isDarkMode,
         onThemeChanged: toggleTheme,
       ),
     );
