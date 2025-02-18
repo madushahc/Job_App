@@ -30,7 +30,6 @@ class _MyAppState extends State<MyApp> {
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       darkTheme: AppTheme.dark,
       theme: AppTheme.light,
-
       home: HomeScreen(isDarkMode: isDarkMode, toggleTheme: toggleTheme),
     );
   }
@@ -54,7 +53,6 @@ class HomeScreen extends StatelessWidget {
             Reccomandjobs(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
           ],
         ),
-
       ),
     );
   }
