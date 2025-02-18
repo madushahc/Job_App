@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:job_app/madusha/customappbar.dart';
+import 'package:job_app/madusha/featured_jobs.dart';
+import 'package:job_app/madusha/reccomandjobs.dart';
 import 'package:job_app/themes/app_themes.dart';
 
 void main() => runApp(const MyApp());
@@ -24,18 +26,33 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: "Job App",
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       darkTheme: AppTheme.dark,
       theme: AppTheme.light,
-      home: Column(
-        children: [
-          CustomAppBar(
-            isDarkMode: isDarkMode,
-            onThemeChanged: toggleTheme,
-          ),
-          SearchBar()
-        ],
+      home: HomeScreen(isDarkMode: isDarkMode, toggleTheme: toggleTheme),
+    );
+  }
+}
+
+class HomeScreen extends StatelessWidget {
+  final bool isDarkMode;
+  final VoidCallback toggleTheme;
+
+  const HomeScreen(
+      {super.key, required this.isDarkMode, required this.toggleTheme});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CustomAppBar(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            FeaturedJobs(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
+            Reccomandjobs(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
+          ],
+        ),
       ),
     );
   }
