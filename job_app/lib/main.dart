@@ -28,9 +28,14 @@ class _MyAppState extends State<MyApp> {
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       darkTheme: AppTheme.dark,
       theme: AppTheme.light,
-      home: CustomAppBar(
-        isDarkMode: isDarkMode,
-        onThemeChanged: toggleTheme,
+      home: Column(
+        children: [
+          CustomAppBar(
+            isDarkMode: isDarkMode,
+            onThemeChanged: toggleTheme,
+          ),
+          SearchBar()
+        ],
       ),
     );
   }
