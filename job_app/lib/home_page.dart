@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key, this.onThemeChanged});
+class HomePage1 extends StatefulWidget {
+  const HomePage1({super.key, this.onThemeChanged});
 
   final VoidCallback? onThemeChanged;
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<HomePage1> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage1> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
