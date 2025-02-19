@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:job_app/lakshika/customsearchbar.dart';
+import 'package:job_app/lakshika/search_Screen.dart';
 
 class SearchButton extends StatelessWidget {
   final bool isDarkMode;
@@ -36,13 +36,18 @@ class SearchButton extends StatelessWidget {
           onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => CustomSearchBar(),
+              builder: (context) => SearchScreen(
+                isDarkMode: isDarkMode,
+                onThemeChanged: onThemeChanged,
+              ),
             ),
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center, // Center content
-            mainAxisSize: MainAxisSize.min, // Prevents unnecessary stretching
+            // Prevents unnecessary stretching
             children: [
+              Padding(
+                padding: EdgeInsets.only(left: 20.0),
+              ),
               Icon(
                 Icons.search,
                 color: iconColor, // Icon color adapts to theme
@@ -50,11 +55,12 @@ class SearchButton extends StatelessWidget {
               ),
               const SizedBox(width: 10), // Space between icon and text
               Text(
-                "Search here...",
+                "  Search here...",
                 style: TextStyle(
                   color: textColor, // Text color adapts to theme
                   fontSize: 20,
                 ),
+                textAlign: TextAlign.start,
               ),
             ],
           ),
