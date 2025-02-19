@@ -48,17 +48,17 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: CustomAppBar(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 10.0,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            SearchButton(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
-            FeaturedJobs(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
-            Reccomandjobs(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
-          ],
+        child: Container(
+          margin: EdgeInsets.only(left: 10.0, right: 10.0, top: 15.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 10.0,
+            children: [
+              SearchButton(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
+              FeaturedJobs(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
+              Reccomandjobs(isDarkMode: isDarkMode, onThemeChanged: toggleTheme)
+            ],
+          ),
         ),
       ),
     );

@@ -139,7 +139,7 @@ class SearchScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isDarkMode
                               ? Colors.blueGrey[700]
-                              : Colors.blue[100],
+                              : Colors.blue[50],
                           borderRadius: BorderRadius.circular(10),
                         ),
                         alignment: Alignment.center,

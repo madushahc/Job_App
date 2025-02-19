@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:job_app/home_page.dart';
 
 class FeaturedJobs extends StatelessWidget {
   final bool isDarkMode;
@@ -12,26 +13,73 @@ class FeaturedJobs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color backgroundColor = isDarkMode ? Colors.black : Colors.blue[50]!;
     final Color textColor = isDarkMode ? Colors.white : Colors.black87;
 
     return SafeArea(
       child: Column(
         children: [
           Container(
-            color: backgroundColor,
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+            ),
             child: Column(
               children: [
-                Text(
-                  "Featured Jobs",
-                  style: TextStyle(
-                      color: textColor,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Featured Jobs",
+                      style: TextStyle(
+                          color: textColor,
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomePage(),
+                        ),
+                      ),
+                      child: Text(
+                        "see all",
+                        style: TextStyle(color: Colors.grey, fontSize: 16.0),
+                      ),
+                    )
+                  ],
                 ),
-                const SizedBox(height: 20),
-                // Add other widgets/content here as per your design
+                Container(
+                  margin: EdgeInsets.only(top: 10.0),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      spacing: 15.0,
+                      children: [
+                        Container(
+                          width: 250,
+                          height: 150,
+                          color: Colors.amberAccent,
+                        ),
+                        Container(
+                          width: 250,
+                          height: 150,
+                          color: const Color.fromARGB(255, 110, 105, 90),
+                        ),
+                        Container(
+                          width: 250,
+                          height: 150,
+                          color: const Color.fromARGB(255, 83, 64, 255),
+                        ),
+                        Container(
+                          width: 250,
+                          height: 150,
+                          color: const Color.fromARGB(255, 255, 64, 169),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
           ),
