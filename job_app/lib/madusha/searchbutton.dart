@@ -14,7 +14,9 @@ class SearchButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     final buttonColor = isDarkMode ? Colors.grey[900] : Colors.white;
+
     final borderColor = isDarkMode ? Colors.white : Colors.black;
     final iconColor = isDarkMode ? Colors.white : Colors.black;
     final textColor = isDarkMode ? Colors.white70 : Colors.black54;

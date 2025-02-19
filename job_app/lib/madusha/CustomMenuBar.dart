@@ -1,4 +1,6 @@
+
 import 'package:amicons/amicons.dart';
+
 import 'package:flutter/material.dart';
 import 'package:job_app/home_page.dart';
 import 'package:job_app/madusha/settings.dart';
@@ -17,7 +19,9 @@ class CustomMenubar extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color textColor = isDarkMode ? Colors.white : Colors.black;
     final Color iconColor = isDarkMode ? Colors.white70 : Colors.black45;
+
     final Color tileColor = isDarkMode ? Colors.black : Colors.white;
+
     final Color highlightColor =
         isDarkMode ? Colors.blue[300]! : Colors.blue[700]!;
 
@@ -28,7 +32,9 @@ class CustomMenubar extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () => Navigator.pop(context),
+
             icon: Icon(Amicons.remix_close, size: 40.0, color: iconColor),
+
           ),
         ],
         toolbarHeight: 100.0,
@@ -36,7 +42,9 @@ class CustomMenubar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
+
               margin: const EdgeInsets.only(left: 40.0),
+
               width: 40.0,
               height: 60.0,
               decoration: const BoxDecoration(
@@ -88,7 +96,9 @@ class CustomMenubar extends StatelessWidget {
                 GestureDetector(
                   onTap: () => Navigator.push(
                     context,
+
                     MaterialPageRoute(builder: (context) => const HomePage1()),
+
                   ),
                   child: Text(
                     "View Profile",
@@ -108,7 +118,9 @@ class CustomMenubar extends StatelessWidget {
             label: "Applications",
             onTap: () => Navigator.push(
               context,
+
               MaterialPageRoute(builder: (context) => const HomePage1()),
+
             ),
             color: textColor,
           ),
@@ -118,7 +130,9 @@ class CustomMenubar extends StatelessWidget {
             label: "Personal Information",
             onTap: () => Navigator.push(
               context,
+
               MaterialPageRoute(builder: (context) => const HomePage1()),
+
             ),
             color: textColor,
           ),
@@ -143,7 +157,9 @@ class CustomMenubar extends StatelessWidget {
             label: "Logout",
             onTap: () => Navigator.push(
               context,
+
               MaterialPageRoute(builder: (context) => const HomePage1()),
+
             ),
             color: Colors.red,
           ),
