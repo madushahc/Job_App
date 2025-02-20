@@ -1,11 +1,8 @@
-
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 import 'package:job_app/home_page.dart';
 import 'package:job_app/madusha/custommenubar.dart';
 import 'package:job_app/madusha/customnotification.dart';
-import 'package:job_app/pages/home_page.dart';
-
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isDarkMode;
@@ -41,9 +38,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               );
             },
-
             icon: Icon(Icons.menu_rounded, color: iconColor),
-
             iconSize: 35.0,
           ),
           Container(
@@ -73,9 +68,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-
                       builder: (context) => const HomePage1(),
-
                     ),
                   );
                 },
@@ -104,7 +97,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             },
             icon: Icon(Amicons.iconly_notification_3_sharp,
                 size: 35.0, color: iconColor),
-
           ),
         ],
       ),

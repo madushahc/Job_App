@@ -39,7 +39,7 @@ class Reccomandjobs extends StatelessWidget {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => HomePage(),
+                          builder: (context) => HomePage1(),
                         ),
                       ),
                       child: Text(
