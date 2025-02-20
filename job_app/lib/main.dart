@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter/scheduler.dart';
 import 'package:job_app/pages/explore_page.dart';
 import 'package:job_app/pages/home_page.dart';
-import 'package:job_app/pages/saved_page.dart';
 import 'package:job_app/pages/profile_page.dart';
-
-import 'package:job_app/madusha/customappbar.dart';
-import 'package:job_app/madusha/featured_jobs.dart';
-import 'package:job_app/madusha/reccomandjobs.dart';
-import 'package:job_app/madusha/searchbutton.dart';
-
+import 'package:job_app/pages/saved_page.dart';
 import 'package:job_app/themes/app_themes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -62,14 +55,8 @@ class _MyAppState extends State<MyApp> {
     ];
 
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: "Job App",
+      title: 'Flutter Demo',
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      darkTheme: AppTheme.dark,
-      theme: AppTheme.light,
-      home: HomePage(
-        onThemeChanged: toggleTheme,
-
       darkTheme: AppTheme.dark.copyWith(
         textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
       ),
@@ -87,7 +74,6 @@ class _MyAppState extends State<MyApp> {
         },
         screens: screens,
       ),
-
     );
   }
 }
@@ -108,11 +94,9 @@ class HomeScreen extends StatelessWidget {
     required this.screens,
   });
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       backgroundColor: isDarkMode ? Colors.grey[900] : Colors.blue[50],
       extendBody: true,
       body: screens[currentIndex],
@@ -138,21 +122,6 @@ class HomeScreen extends StatelessWidget {
             Icon(Amicons.iconly_profile, size: 30),
           ],
           onTap: onTabTapped,
-        ),
-
-      appBar: CustomAppBar(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 10.0,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(5.0),
-            ),
-            SearchButton(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
-            FeaturedJobs(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
-            Reccomandjobs(isDarkMode: isDarkMode, onThemeChanged: toggleTheme),
-          ],
         ),
       ),
     );
