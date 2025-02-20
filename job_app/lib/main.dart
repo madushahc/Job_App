@@ -55,6 +55,9 @@ class _MyAppState extends State<MyApp> {
     ];
 
     return MaterialApp(
+
+      debugShowCheckedModeBanner: false,
+
       title: 'Flutter Demo',
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       darkTheme: AppTheme.dark.copyWith(
