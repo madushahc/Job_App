@@ -24,7 +24,8 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Settings", style: TextStyle(fontSize: 22.0)),
+        title: const Text("Settings",
+            style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold)),
         centerTitle: true,
         toolbarHeight: 80.0,
       ),
