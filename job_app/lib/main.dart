@@ -106,7 +106,7 @@ class HomeScreen extends StatelessWidget {
       bottomNavigationBar: Theme(
         data: Theme.of(context).copyWith(
           iconTheme: IconThemeData(
-            color: isDarkMode ? Colors.white : Colors.white,
+            color: isDarkMode ? Colors.white : Colors.black,
           ),
         ),
         child: CurvedNavigationBar(
@@ -114,10 +114,9 @@ class HomeScreen extends StatelessWidget {
           animationCurve: Curves.easeInOut,
           animationDuration: Duration(milliseconds: 300),
           backgroundColor: Colors.transparent,
-          color: isDarkMode ? Colors.grey[800]! : Colors.blue[300]!,
-          buttonBackgroundColor: isDarkMode
-              ? Colors.grey[800]!
-              : const Color.fromARGB(255, 29, 88, 191),
+          color: isDarkMode ? Colors.blue[400]! : Colors.blue[200]!,
+          buttonBackgroundColor:
+              isDarkMode ? Colors.lightBlue[900]! : Colors.blue[800]!,
           items: <Widget>[
             Icon(Amicons.iconly_home, size: 30),
             Icon(Amicons.flaticon_world_sharp, size: 30),

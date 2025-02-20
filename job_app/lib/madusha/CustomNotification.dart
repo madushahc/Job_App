@@ -29,6 +29,7 @@ class CustomNotification extends StatelessWidget {
                 child: Text(
                   "Notification",
                   textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ),
