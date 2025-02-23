@@ -45,7 +45,10 @@ class _MyAppState extends State<MyApp> {
         isDarkMode: isDarkMode,
         toggleTheme: toggleTheme,
       ),
-      ExplorePage(),
+      ExplorePage(
+        isDarkMode: isDarkMode,
+        onThemeChanged: () => toggleTheme(!isDarkMode),
+      ),
       SavedPage(),
       ProfilePage(),
       Settings.Settings(
@@ -55,9 +58,7 @@ class _MyAppState extends State<MyApp> {
     ];
 
     return MaterialApp(
-
       debugShowCheckedModeBanner: false,
-
       title: 'Flutter Demo',
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       darkTheme: AppTheme.dark.copyWith(
