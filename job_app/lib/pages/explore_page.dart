@@ -29,6 +29,7 @@ class _HomePageState extends State<ExplorePage> {
     return Scaffold(
       backgroundColor: widget.isDarkMode ? Colors.black : Colors.blue[50],
       appBar: AppBar(
+        backgroundColor: widget.isDarkMode ? Colors.black : Colors.blue[50],
         title: const Text("Explore",
             style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold)),
         centerTitle: true,

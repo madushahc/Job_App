@@ -108,9 +108,9 @@ class _CustomCardState extends State<CustomCard> {
                     Row(
                       children: [
                         Text(
-                          " USD",
+                          "\$",
                           style: TextStyle(
-                            fontSize: 16.0,
+                            fontSize: 18.0,
                             fontWeight: FontWeight.w600,
                             color: textColor,
                           ),
