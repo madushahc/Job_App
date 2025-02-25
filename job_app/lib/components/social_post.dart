@@ -1,12 +1,74 @@
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 
-class SocialPost extends StatelessWidget {
+class SocialPost extends StatefulWidget {
+  @override
+  _SocialPostState createState() => _SocialPostState();
+}
+
+class _SocialPostState extends State<SocialPost> {
   final List<String> _posts = [
     'Post 1',
     'Post 2',
     'Post 3',
+    'Post 4',
   ];
+
+  // State lists for likes, dislikes, and comments
+  late List<bool> _likedPosts;
+  late List<bool> _dislikedPosts;
+  late List<int> _likeCounts;
+  late List<int> _dislikeCounts;
+  late List<int> _commentCounts;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize state for each post
+    _likedPosts = List.filled(_posts.length, false);
+    _dislikedPosts = List.filled(_posts.length, false);
+    _likeCounts = List.filled(_posts.length, 0);
+    _dislikeCounts = List.filled(_posts.length, 0);
+    _commentCounts = List.filled(_posts.length, 0);
+  }
+
+  void _toggleLike(int index) {
+    setState(() {
+      if (_likedPosts[index]) {
+        _likedPosts[index] = false;
+        _likeCounts[index]--;
+      } else {
+        _likedPosts[index] = true;
+        _likeCounts[index]++;
+        if (_dislikedPosts[index]) {
+          _dislikedPosts[index] = false;
+          _dislikeCounts[index]--;
+        }
+      }
+    });
+  }
+
+  void _toggleDislike(int index) {
+    setState(() {
+      if (_dislikedPosts[index]) {
+        _dislikedPosts[index] = false;
+        _dislikeCounts[index]--;
+      } else {
+        _dislikedPosts[index] = true;
+        _dislikeCounts[index]++;
+        if (_likedPosts[index]) {
+          _likedPosts[index] = false;
+          _likeCounts[index]--;
+        }
+      }
+    });
+  }
+
+  void _addComment(int index) {
+    setState(() {
+      _commentCounts[index]++;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,12 +77,12 @@ class SocialPost extends StatelessWidget {
     final Color subtextColor =
         isDarkMode ? Colors.grey[400]! : Colors.grey[800]!;
     final Color cardColor = isDarkMode ? Colors.grey[900]! : Colors.white;
+
     return ListView.builder(
       itemCount: _posts.length,
       itemBuilder: (context, index) {
         return Padding(
-          padding: const EdgeInsets.only(
-              right: 16.0, left: 16.0, top: 8.0, bottom: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
           child: Card(
             color: cardColor,
             elevation: 5,
@@ -29,78 +91,75 @@ class SocialPost extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 20.0),
-                          child: CircleAvatar(
-                            backgroundImage: AssetImage('assets/profile.jpeg'),
-                            radius: 24,
+                  // User Info
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: AssetImage('assets/profile.jpeg'),
+                        radius: 24,
+                      ),
+                      SizedBox(width: 12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Elon Musk',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: textColor),
                           ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(width: 10),
-                            Text(
-                              'Elon Musk',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                  color: textColor),
-                            ),
-                            SizedBox(width: 10),
-                            Text(
-                              '11 min ago',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                  color: subtextColor),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
+                          Text(
+                            '11 min ago',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                color: subtextColor),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  SizedBox(width: 20),
-                  Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Text(
-                      'Prioritizing User Feedback',
-                      style: TextStyle(
-                          color: textColor,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16),
-                    ),
+                  SizedBox(height: 10),
+
+                  // Post Title & Content
+                  Text(
+                    'Prioritizing User Feedback',
+                    style: TextStyle(
+                        color: textColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16),
                   ),
                   SizedBox(height: 10),
                   Text(
-                    'Regularly gather and integrate user insights through testing and surveys to ensure the app meets real needs.',
+                    'Regularly gather and integrate user insights through testing and surveys to ensure the app meets real needs.', // Dynamic content
                     style: TextStyle(fontSize: 14, color: subtextColor),
                   ),
+
+                  // Divider
                   Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: Divider(
-                      color: Colors.grey,
-                      thickness: 1,
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Divider(color: Colors.grey, thickness: 1),
                   ),
-                  SizedBox(
-                    height: 5,
-                  ),
+
+                  // Action Buttons
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
+                      // Like Button
                       Row(
                         children: [
                           IconButton(
-                            icon: Icon(Amicons.lucide_thumbs_up),
-                            onPressed: () {},
+                            icon: Icon(
+                              _likedPosts[index]
+                                  ? Amicons.remix_thumb_up_fill
+                                  : Amicons.remix_thumb_up,
+                              color: _likedPosts[index] ? Colors.blue : null,
+                            ),
+                            onPressed: () => _toggleLike(index),
                           ),
                           Text(
-                            '30',
+                            '${_likeCounts[index]}',
                             style: TextStyle(
                                 fontSize: 16,
                                 color: textColor,
@@ -108,14 +167,19 @@ class SocialPost extends StatelessWidget {
                           ),
                         ],
                       ),
+
+                      // Dislike Button
                       Row(
                         children: [
                           IconButton(
-                            icon: Icon(Amicons.lucide_thumbs_down),
-                            onPressed: () {},
+                            icon: Icon(
+                              Amicons.lucide_thumbs_down,
+                              color: _dislikedPosts[index] ? Colors.red : null,
+                            ),
+                            onPressed: () => _toggleDislike(index),
                           ),
                           Text(
-                            '2',
+                            '${_dislikeCounts[index]}',
                             style: TextStyle(
                                 fontSize: 16,
                                 color: textColor,
@@ -123,14 +187,16 @@ class SocialPost extends StatelessWidget {
                           ),
                         ],
                       ),
+
+                      // Comment Button
                       Row(
                         children: [
                           IconButton(
                             icon: Icon(Amicons.flaticon_comment_alt_rounded),
-                            onPressed: () {},
+                            onPressed: () => _addComment(index),
                           ),
                           Text(
-                            '10',
+                            '${_commentCounts[index]}',
                             style: TextStyle(
                                 fontSize: 16,
                                 color: textColor,
