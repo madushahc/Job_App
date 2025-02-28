@@ -45,7 +45,10 @@ class _MyAppState extends State<MyApp> {
         isDarkMode: isDarkMode,
         toggleTheme: toggleTheme,
       ),
-      ExplorePage(),
+      ExplorePage(
+        isDarkMode: isDarkMode,
+        onThemeChanged: () => toggleTheme(!isDarkMode),
+      ),
       SavedPage(),
       ProfilePage(),
       Settings.Settings(
@@ -55,9 +58,7 @@ class _MyAppState extends State<MyApp> {
     ];
 
     return MaterialApp(
-
       debugShowCheckedModeBanner: false,
-
       title: 'Flutter Demo',
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       darkTheme: AppTheme.dark.copyWith(
@@ -97,6 +98,31 @@ class HomeScreen extends StatelessWidget {
     required this.screens,
   });
 
+  Icon getIcon(int index) {
+    List<IconData> icons = [
+      Amicons.iconly_home,
+      Amicons.flaticon_world_sharp,
+      Amicons.iconly_bookmark,
+      Amicons.iconly_profile
+    ];
+
+    List<IconData> selectedIcons = [
+      Amicons.iconly_home_fill,
+      Amicons.flaticon_world_sharp_fill,
+      Amicons.iconly_bookmark_fill,
+      Amicons.iconly_profile_fill,
+    ];
+
+    Color selectedColor = isDarkMode ? Colors.black : Colors.white;
+    Color unselectedColor = isDarkMode ? Colors.white : Colors.black;
+
+    return Icon(
+      currentIndex == index ? selectedIcons[index] : icons[index],
+      size: 30,
+      color: currentIndex == index ? selectedColor : unselectedColor,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,18 +140,53 @@ class HomeScreen extends StatelessWidget {
           animationCurve: Curves.easeInOut,
           animationDuration: Duration(milliseconds: 300),
           backgroundColor: Colors.transparent,
-          color: isDarkMode ? Colors.blue[400]! : Colors.blue[200]!,
+          color: isDarkMode ? Colors.blue[900]! : Colors.blue[200]!,
           buttonBackgroundColor:
-              isDarkMode ? Colors.lightBlue[900]! : Colors.blue[800]!,
+              isDarkMode ? Colors.lightBlue[400]! : Colors.blue[900]!,
           items: <Widget>[
-            Icon(Amicons.iconly_home, size: 30),
-            Icon(Amicons.flaticon_world_sharp, size: 30),
-            Icon(Amicons.iconly_bookmark, size: 30),
-            Icon(Amicons.iconly_profile, size: 30),
+            getIcon(0),
+            getIcon(1),
+            getIcon(2),
+            getIcon(3),
           ],
           onTap: onTabTapped,
         ),
       ),
+      floatingActionButton: currentIndex == 0 || currentIndex == 1
+          ? Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (currentIndex == 0) // FAB for HomePage (index 0)
+                  FloatingActionButton(
+                    onPressed: () {
+                      // Add your HomePage FAB action here
+                      print("HomePage FAB pressed");
+                    },
+                    backgroundColor:
+                        isDarkMode ? Colors.blue[900] : Colors.blue[200],
+                    child: Icon(
+                      Amicons.remix_android, // Example icon for HomePage
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                  ),
+                if (currentIndex == 0)
+                  SizedBox(height: 0), // Space between FABs
+                if (currentIndex == 1) // FAB for ExplorePage (index 1)
+                  FloatingActionButton(
+                    onPressed: () {
+                      print("Explore FAB pressed");
+                    },
+                    backgroundColor:
+                        isDarkMode ? Colors.blue[900] : Colors.blue[200],
+                    child: Icon(
+                      Amicons.remix_add,
+                      size: 30,
+                      color: isDarkMode ? Colors.white : Colors.black,
+                    ),
+                  ),
+              ],
+            )
+          : null,
     );
   }
 }

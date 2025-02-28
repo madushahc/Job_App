@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:job_app/home_page.dart';
+import 'package:job_app/madusha/customcard.dart';
 
 class Reccomandjobs extends StatelessWidget {
   final bool isDarkMode;
@@ -19,10 +20,7 @@ class Reccomandjobs extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            padding: EdgeInsets.only(
-              left: 16.0,
-              right: 16.0,
-            ),
+            padding: EdgeInsets.only(left: 16.0, right: 16.0, bottom: 0),
             child: Column(
               children: [
                 Row(
@@ -44,7 +42,8 @@ class Reccomandjobs extends StatelessWidget {
                       ),
                       child: Text(
                         "see all",
-                        style: TextStyle(color: Colors.grey, fontSize: 16.0),
+                        style:
+                            TextStyle(color: Colors.lightBlue, fontSize: 16.0),
                       ),
                     )
                   ],
@@ -56,26 +55,10 @@ class Reccomandjobs extends StatelessWidget {
                     child: Row(
                       spacing: 15.0,
                       children: [
-                        Container(
-                          width: 250,
-                          height: 150,
-                          color: Colors.amberAccent,
-                        ),
-                        Container(
-                          width: 250,
-                          height: 150,
-                          color: const Color.fromARGB(255, 110, 105, 90),
-                        ),
-                        Container(
-                          width: 250,
-                          height: 150,
-                          color: const Color.fromARGB(255, 83, 64, 255),
-                        ),
-                        Container(
-                          width: 250,
-                          height: 150,
-                          color: const Color.fromARGB(255, 255, 64, 169),
-                        ),
+                        CustomCard(),
+                        CustomCard(),
+                        CustomCard(),
+                        CustomCard(),
                       ],
                     ),
                   ),

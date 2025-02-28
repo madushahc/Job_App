@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:job_app/lakshika/job_search_filters.dart';
 
 class SearchScreen extends StatelessWidget {
   final List<String> popularRoles = [
@@ -93,10 +94,16 @@ class SearchScreen extends StatelessWidget {
                 style:
                     TextStyle(color: isDarkMode ? Colors.white : Colors.black),
               ),
+              SizedBox(height: 10.0),
               Align(
                 alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
+                child: GestureDetector(
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FiltersScreen(),
+                    ),
+                  ),
                   child: Text(
                     "Filters",
                     style: TextStyle(

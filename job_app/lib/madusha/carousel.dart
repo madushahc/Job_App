@@ -1,29 +1,38 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
-class CarouselImages extends StatelessWidget {
-  const CarouselImages({super.key});
+class ImageCarousel extends StatefulWidget {
+  const ImageCarousel({super.key});
 
   @override
+  State<ImageCarousel> createState() => _ImageCarouselState();
+}
+
+class _ImageCarouselState extends State<ImageCarousel> {
+  final List<String> imglist = [
+    "assets/job.png",
+    "assets/job2.jpg",
+    "assets/job3.jpg",
+  ];
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(10.0),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20.0),
-              child: Image(
-                image: AssetImage("assets/profile.jpeg"),
-                fit: BoxFit.contain,
+    return Center(
+      child: CarouselSlider(
+        items: imglist
+            .map(
+              (e) => Center(
+                child: Image.asset(e),
               ),
-            ),
-          )
-        ],
+            )
+            .toList(),
+        options: CarouselOptions(
+          initialPage: 0,
+          autoPlay: true,
+          autoPlayInterval: Duration(seconds: 3),
+          enlargeCenterPage: true,
+          enlargeFactor: 0.5,
+          viewportFraction: 0.9,
+        ),
       ),
     );
   }
