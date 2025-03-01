@@ -5,12 +5,12 @@ class ChatbotMain extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Under Maintain 😂 '),
+        title: Text('Hello Chat Bot'),
         backgroundColor: Colors.blue,
       ),
       body: Center(
         child: Text(
-          'Under Maintain 😂 ',
+          'Hello Chat Bot!',
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
