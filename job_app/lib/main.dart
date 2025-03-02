@@ -9,6 +9,7 @@ import 'package:job_app/themes/app_themes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:job_app/madusha/settings.dart' as Settings;
+import 'package:job_app/chatbot/chatbot_main.dart'; //amantha
 import 'package:amicons/amicons.dart';
 
 void main() => runApp(const MyApp());
@@ -153,28 +154,39 @@ class HomeScreen extends StatelessWidget {
           onTap: onTabTapped,
         ),
       ),
+
+      //Amantha
+      //add floting action button and it navigate to chatbot
       floatingActionButton: currentIndex == 0 || currentIndex == 1
           ? Column(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (currentIndex == 0) // FAB for HomePage (index 0)
+                if (currentIndex == 0)
                   FloatingActionButton(
                     onPressed: () {
-                      // Add your HomePage FAB action here
-                      print("HomePage FAB pressed");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatbotMain(),
+                        ),
+                      );
                     },
-                    backgroundColor:
-                        isDarkMode ? Colors.blue[900] : Colors.blue[200],
-                    child: Icon(
-                      Amicons.remix_android, // Example icon for HomePage
-                      color: isDarkMode ? Colors.white : Colors.black,
+                    backgroundColor: isDarkMode
+                        ? const Color.fromARGB(255, 252, 252, 252)
+                        : const Color.fromARGB(255, 255, 255, 255),
+                    child: Image.asset(
+                      'assets/Upsees.png',
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.contain,
                     ),
                   ),
-                if (currentIndex == 0)
-                  SizedBox(height: 0), // Space between FABs
-                if (currentIndex == 1) // FAB for ExplorePage (index 1)
+                if (currentIndex == 1)
                   FloatingActionButton(
                     onPressed: () {
+
+                      print("UPSEES BOT is Working ");
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -184,6 +196,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                       );
+
                     },
                     backgroundColor:
                         isDarkMode ? Colors.blue[900] : Colors.blue[200],
