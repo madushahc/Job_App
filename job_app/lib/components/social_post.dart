@@ -1,5 +1,6 @@
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
+import 'package:job_app/components/like_button.dart';
 
 class SocialPost extends StatefulWidget {
   @override
@@ -158,6 +159,10 @@ class _SocialPostState extends State<SocialPost> {
                             ),
                             onPressed: () => _toggleLike(index),
                           ),
+                          // LikeButton(
+                          //   isLiked: false,
+                          //   onTap: () {},
+                          // ),
                           Text(
                             '${_likeCounts[index]}',
                             style: TextStyle(
