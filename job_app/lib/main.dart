@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:job_app/components/add_post.dart';
 import 'package:job_app/pages/explore_page.dart';
 import 'package:job_app/pages/home_page.dart';
 import 'package:job_app/pages/profile_page.dart';
@@ -183,7 +184,19 @@ class HomeScreen extends StatelessWidget {
                 if (currentIndex == 1)
                   FloatingActionButton(
                     onPressed: () {
+
                       print("UPSEES BOT is Working ");
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddPost(
+                            isDarkMode: isDarkMode,
+                            onThemeChanged: () => toggleTheme(!isDarkMode),
+                          ),
+                        ),
+                      );
+
                     },
                     backgroundColor:
                         isDarkMode ? Colors.blue[900] : Colors.blue[200],
