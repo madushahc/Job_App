@@ -16,10 +16,10 @@ class _CustomCardState extends State<CustomCard> {
     final Color textColor = isDarkMode ? Colors.white : Colors.black87;
     final Color subtitleColor =
         isDarkMode ? Colors.grey[400]! : Colors.grey[700]!;
-    final Color cardColor = isDarkMode ? Colors.grey[800]! : Colors.white;
+    final Color cardColor = isDarkMode ? Colors.grey[900]! : Colors.white;
     final Color iconColor = isDarkMode ? Colors.white : Colors.blueAccent;
     final Color tagBackground =
-        isDarkMode ? Colors.blueGrey[800]! : Colors.blue[50]!;
+        isDarkMode ? Colors.transparent : Colors.blue[50]!;
     final Color tagTextColor =
         isDarkMode ? Colors.blueAccent : Colors.blueAccent;
     final Color locationColor = isDarkMode ? Colors.white70 : Colors.black87;
