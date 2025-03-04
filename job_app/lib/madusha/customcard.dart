@@ -1,172 +1,171 @@
-import 'package:amicons/amicons.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart'; // For rendering HTML
+import 'package:job_app/madusha/jobdetailscreen.dart';
 
-class CustomCard extends StatefulWidget {
-  const CustomCard({super.key});
+class Home extends StatefulWidget {
+  const Home({super.key});
 
   @override
-  State<CustomCard> createState() => _CustomCardState();
+  State<Home> createState() => _HomeState();
 }
 
-class _CustomCardState extends State<CustomCard> {
+class _HomeState extends State<Home> {
+  List<dynamic> jobs = [];
+  bool isLoading = true;
+  String errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchJobs();
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Determine the current theme (light or dark)
-    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final Color textColor = isDarkMode ? Colors.white : Colors.black87;
-    final Color subtitleColor =
-        isDarkMode ? Colors.grey[400]! : Colors.grey[700]!;
-    final Color cardColor = isDarkMode ? Colors.grey[800]! : Colors.white;
-    final Color iconColor = isDarkMode ? Colors.white : Colors.blueAccent;
-    final Color tagBackground =
-        isDarkMode ? Colors.blueGrey[800]! : Colors.blue[50]!;
-    final Color tagTextColor =
-        isDarkMode ? Colors.blueAccent : Colors.blueAccent;
-    final Color locationColor = isDarkMode ? Colors.white70 : Colors.black87;
+    return Container(
+      child: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            ) // Show loading indicator while fetching
+          : errorMessage.isNotEmpty
+              ? Center(
+                  child: Text(errorMessage),
+                ) // Show error message if fetch failed
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(10),
+                  itemCount: jobs.length,
+                  itemBuilder: (context, index) {
+                    final job = jobs[index];
+                    final title = job["job_title"] ?? "No Title";
+                    final company = job["employer_name"] ?? "Unknown Company";
+                    final logo = job["employer_logo"];
 
-    return Center(
-      child: Container(
-        height: 220.0,
-        width: 380.0,
-        child: Card(
-          color: cardColor,
-          elevation: 4.0,
-          margin: EdgeInsets.only(right: 16.0, top: 12.0, bottom: 12.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              spacing: 6.0,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Profile Image
-                    Container(
-                      width: 50.0,
-                      height: 50.0,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: AssetImage("assets/profile.jpeg"),
-                          fit: BoxFit.cover,
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => JobDetailsPage(job: job),
+                          ),
+                        );
+                      },
+                      child: Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 3,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              HtmlWidget(
+                                title,
+                                textStyle: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              Text(
+                                "Location",
+                                style: const TextStyle(
+                                  color: Colors.blueGrey,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  logo != null
+                                      ? Image.network(
+                                          logo,
+                                          height: 40,
+                                          width: 40,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return const Icon(
+                                              Icons.image_not_supported,
+                                              size: 40,
+                                            );
+                                          },
+                                        )
+                                      : const Icon(
+                                          Icons.image_not_supported,
+                                          size: 40,
+                                        ),
+                                  const SizedBox(width: 10),
+                                  HtmlWidget(
+                                    company,
+                                    textStyle: const TextStyle(fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 12.0),
-                    // Job Title & Company
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Software Engineer",
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                              color: textColor,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            "Microsoft",
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              color: subtitleColor,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Save Icon
-                    Icon(
-                      Amicons.vuesax_save_2,
-                      size: 30.0,
-                      color: iconColor,
-                    ),
-                  ],
+                    );
+                  },
                 ),
-                SizedBox(height: 12.0),
-                // Job Tags
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildTag("IT", tagBackground, tagTextColor),
-                    _buildTag("Full Time", tagBackground, tagTextColor),
-                    _buildTag("Junior", tagBackground, tagTextColor),
-                  ],
-                ),
-                SizedBox(height: 10.0),
-                // Salary & Location
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          "\$",
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
-                        ),
-                        SizedBox(width: 5.0),
-                        Text(
-                          "1000 ",
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Icon(Icons.location_on, color: Colors.red, size: 20.0),
-                        SizedBox(width: 5.0),
-                        Text(
-                          "California, USA",
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                            color: locationColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 
-  // Badge Widget for Job Type Tags
-  Widget _buildTag(String text, Color background, Color textColor) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: Colors.blueAccent, width: 1),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: textColor,
-          fontWeight: FontWeight.w600,
-          fontSize: 14.0,
-        ),
-      ),
-    );
+  Future<void> fetchJobs() async {
+    print("Fetching job details...");
+
+    const String query = "jobs"; // General query for all job types
+    const int numPages = 1; // Increase for more jobs
+
+    final String url =
+        'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
+    final Uri uri = Uri.parse(url);
+
+    final headers = {
+      'x-rapidapi-host': 'jsearch.p.rapidapi.com',
+      'x-rapidapi-key':
+          '7b4e3ff2a2msh4baec94f9e23c12p11e56bjsnf5b36a8f5dd6', // Replace with actual key
+    };
+
+    try {
+      final response = await http.get(uri, headers: headers);
+
+      print("Response Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final body = response.body;
+        final json = jsonDecode(body);
+        print("Fetched Data: $json");
+
+        if (json['data'] != null && json['data'].isNotEmpty) {
+          setState(() {
+            jobs = json['data']; // Store multiple jobs
+            isLoading = false;
+          });
+          print("Jobs list fetched successfully");
+        } else {
+          setState(() {
+            isLoading = false;
+            errorMessage = "No jobs found";
+          });
+        }
+      } else {
+        setState(() {
+          isLoading = false;
+          errorMessage = "Failed to fetch job details: ${response.statusCode}";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        errorMessage = "Error fetching job details: $e";
+      });
+    }
   }
 }

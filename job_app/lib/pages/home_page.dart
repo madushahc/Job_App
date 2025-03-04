@@ -37,7 +37,7 @@ class HomePage extends StatelessWidget {
               FeaturedJobs(
                   isDarkMode: isDarkMode,
                   onThemeChanged: () => toggleTheme(!isDarkMode)),
-              Reccomandjobs(
+              RecomendedJobs(
                   isDarkMode: isDarkMode,
                   onThemeChanged: () => toggleTheme(!isDarkMode)),
               SizedBox(height: 10.0),
