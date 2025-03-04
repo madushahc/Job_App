@@ -397,8 +397,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                     const SizedBox(height: 10),
 
                     // Location
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    Wrap(
                       children: [
                         Text(
                           salary,
