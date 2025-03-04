@@ -14,6 +14,7 @@ class _ImageCarouselState extends State<ImageCarousel> {
     "assets/job2.jpg",
     "assets/job3.jpg",
   ];
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -21,14 +22,21 @@ class _ImageCarouselState extends State<ImageCarousel> {
         items: imglist
             .map(
               (e) => Center(
-                child: Image.asset(e),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10), // Radius of 10
+                  child: Image.asset(
+                    e,
+                    fit:
+                        BoxFit.cover, // Optional: ensures image fills the space
+                  ),
+                ),
               ),
             )
             .toList(),
         options: CarouselOptions(
           initialPage: 0,
           autoPlay: true,
-          autoPlayInterval: Duration(seconds: 3),
+          autoPlayInterval: const Duration(seconds: 3),
           enlargeCenterPage: true,
           enlargeFactor: 0.5,
           viewportFraction: 0.9,

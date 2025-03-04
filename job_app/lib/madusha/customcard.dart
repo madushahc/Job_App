@@ -44,6 +44,24 @@ class _HomeState extends State<Home> {
                     final company = job["employer_name"] ?? "Unknown Company";
                     final logo = job["employer_logo"];
 
+                    // Determine the current theme (light or dark)
+                    final bool isDarkMode =
+                        Theme.of(context).brightness == Brightness.dark;
+                    final Color textColor =
+                        isDarkMode ? Colors.white : Colors.black87;
+                    final Color subtitleColor =
+                        isDarkMode ? Colors.grey[400]! : Colors.grey[700]!;
+                    final Color cardColor =
+                        isDarkMode ? Colors.grey[900]! : Colors.white;
+                    final Color iconColor =
+                        isDarkMode ? Colors.white : Colors.blueAccent;
+                    final Color tagBackground =
+                        isDarkMode ? Colors.transparent : Colors.blue[50]!;
+                    final Color tagTextColor =
+                        isDarkMode ? Colors.blueAccent : Colors.blueAccent;
+                    final Color locationColor =
+                        isDarkMode ? Colors.white70 : Colors.black87;
+
                     return GestureDetector(
                       onTap: () {
                         Navigator.push(
