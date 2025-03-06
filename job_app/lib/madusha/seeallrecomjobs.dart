@@ -4,23 +4,22 @@ import 'package:http/http.dart' as http;
 
 import 'package:job_app/madusha/jobdetailscreen.dart';
 import 'package:amicons/amicons.dart';
-import 'package:job_app/madusha/seeallrecomjobs.dart';
 
-class RecomendedJobs extends StatefulWidget {
+class SeeAllRecomendedJobs extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback onThemeChanged;
 
-  const RecomendedJobs({
+  const SeeAllRecomendedJobs({
     super.key,
     required this.isDarkMode,
     required this.onThemeChanged,
   });
 
   @override
-  State<RecomendedJobs> createState() => _RecomendedJobsState();
+  State<SeeAllRecomendedJobs> createState() => _SeeAllRecomendedJobsState();
 }
 
-class _RecomendedJobsState extends State<RecomendedJobs> {
+class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
   List<dynamic> jobs = [];
   bool isLoading = true;
   String errorMessage = '';
@@ -32,11 +31,11 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
   }
 
   Future<void> fetchJobs() async {
-    print("Fetching job details...");
+    debugPrint("Fetching job details...");
 
     const String query =
-        "Software Engineer OR Developer OR QA  "; // Combined query
-    const int numPages = 1; // Increase for more jobs
+        "Software Engineer OR Developer OR QA "; // Combined query
+    const int numPages = 20; // Increase for more jobs
 
     final String url =
         'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
@@ -51,20 +50,20 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
     try {
       final response = await http.get(uri, headers: headers);
 
-      print("Response Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
+      debugPrint("Response Status Code: ${response.statusCode}");
+      debugPrint("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final body = response.body;
         final json = jsonDecode(body);
-        print("Fetched Data: $json");
+        debugPrint("Fetched Data: $json");
 
         if (json['data'] != null && json['data'].isNotEmpty) {
           setState(() {
             jobs = json['data']; // Store multiple jobs
             isLoading = false;
           });
-          print("Jobs list fetched successfully");
+          debugPrint("Jobs list fetched successfully");
         } else {
           setState(() {
             isLoading = false;
@@ -99,72 +98,44 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
         isDarkMode ? Colors.blueAccent : Colors.blueAccent;
     final Color locationColor = isDarkMode ? Colors.white70 : Colors.black87;
 
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Recommended Jobs",
-                style: TextStyle(
-                    color: textColor,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold),
-              ),
-              GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SeeAllRecomendedJobs(
-                        isDarkMode: isDarkMode,
-                        onThemeChanged: widget.onThemeChanged),
-                  ),
-                ),
-                child: Text(
-                  "see all",
-                  style: TextStyle(color: Colors.lightBlue, fontSize: 16.0),
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 10.0), // Reduced extra spacing
-        isLoading
-            ? const Center(
-                child: CircularProgressIndicator(),
-              ) // Show loading indicator while fetching
-            : errorMessage.isNotEmpty
-                ? Center(
-                    child: Text(errorMessage),
-                  ) // Show error message if fetch failed
-                : SizedBox(
-                    height: 200, // Set a fixed height for the horizontal list
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: EdgeInsets.only(left: 15.0, bottom: 15.0),
-                      itemCount: jobs.length,
-                      itemBuilder: (context, index) {
-                        final job = jobs[index];
-                        final title = job["job_title"] ?? "";
-                        final company = job["employer_name"] ?? "";
-                        final logo = job["employer_logo"];
-                        final city = job["job_city"] ?? "";
-                        final state = job["job_state"] ?? "";
-                        final country = job["job_country"] ?? "";
-                        final currency = job["job_salary_currency"] ?? "";
-                        final salary = job["job_min_salary"]?.toString() ?? "";
-                        final position = job["job_job_title"] ?? "";
-                        final industry = job["employer_company_type"] ?? "";
-                        final type = job["job_employment_type"] ?? "";
+    return Scaffold(
+      appBar: AppBar(
+        title: Center(child: Text("Recommended Jobs")),
+      ),
+      body: Column(
+        children: [
+          SizedBox(height: 10.0), // Reduced extra spacing
+          isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                ) // Show loading indicator while fetching
+              : errorMessage.isNotEmpty
+                  ? Center(
+                      child: Text(errorMessage),
+                    ) // Show error message if fetch failed
+                  : Expanded(
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        padding: EdgeInsets.only(
+                            left: 15.0, right: 15.0, bottom: 15.0),
+                        itemCount: jobs.length,
+                        itemBuilder: (context, index) {
+                          final job = jobs[index];
+                          final title = job["job_title"] ?? "";
+                          final company = job["employer_name"] ?? "";
+                          final logo = job["employer_logo"];
+                          final city = job["job_city"] ?? "";
+                          final state = job["job_state"] ?? "";
+                          final country = job["job_country"] ?? "";
+                          final currency = job["job_salary_currency"] ?? "";
+                          final salary =
+                              job["job_min_salary"]?.toString() ?? "";
+                          final position = job["job_job_title"] ?? "";
+                          final industry = job["employer_company_type"] ?? "";
+                          final type = job["job_employment_type"] ?? "";
 
-                        return Padding(
-                          padding: EdgeInsets.only(right: 15.0),
-                          child: SizedBox(
-                            width: MediaQuery.of(context)
-                                .size
-                                .width, // Set a bounded width for each item
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 15.0),
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -178,10 +149,7 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
                               child: Card(
                                 color: cardColor,
                                 elevation: 4.0,
-                                margin: EdgeInsets.only(
-                                  right: 16.0,
-                                  top: 12.0,
-                                ),
+                                margin: EdgeInsets.only(right: 16.0, top: 12.0),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15.0),
                                 ),
@@ -262,9 +230,9 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
                                         ],
                                       ),
                                       SizedBox(height: 12.0),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
+                                      Wrap(
+                                        spacing: 8.0,
+                                        runSpacing: 8.0,
                                         children: [
                                           if (industry.isNotEmpty)
                                             _buildTag(industry, tagBackground,
@@ -330,12 +298,12 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
-                  ),
-      ],
+        ],
+      ),
     );
   }
 
