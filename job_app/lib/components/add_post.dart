@@ -83,9 +83,9 @@ class _AddPostState extends State<AddPost> {
               TextFormField(
                 maxLength: 50,
                 style: TextStyle(
-                  color: isDarkMode
-                      ? Colors.black
-                      : Colors.white, // Adapts to dark/light mode
+                  color: widget.isDarkMode
+                      ? Colors.white
+                      : Colors.black, // Adapts to dark/light mode
                   fontSize: 20,
                 ),
                 decoration: InputDecoration(
@@ -103,9 +103,9 @@ class _AddPostState extends State<AddPost> {
                   minLines: 5,
                   maxLines: 10,
                   style: TextStyle(
-                    color: isDarkMode
-                        ? Colors.black
-                        : Colors.white, // Adapts to dark/light mode
+                    color: widget.isDarkMode
+                        ? Colors.white
+                        : Colors.black, // Adapts to dark/light mode
                     fontSize: 20,
                   ),
                   decoration: InputDecoration(
