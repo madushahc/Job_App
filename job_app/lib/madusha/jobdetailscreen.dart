@@ -10,6 +10,7 @@ class JobDetailsPage extends StatefulWidget {
 
 class _JobDetailsPageState extends State<JobDetailsPage> {
   int _selectedTab = 0; // To keep track of the selected tab
+  bool _isBookmarked = false; // To track bookmark state
 
   // Helper function to remove HTML tags from a string
   String _removeHtmlTags(String html) {
@@ -360,8 +361,20 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                           icon: Icon(Icons.arrow_back,
                               size: 35, color: textColor),
                         ),
-                        Icon(Icons.bookmark_add_outlined,
-                            size: 35, color: textColor),
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _isBookmarked = !_isBookmarked;
+                            });
+                          },
+                          icon: Icon(
+                            _isBookmarked
+                                ? Icons.bookmark_added_rounded
+                                : Icons.bookmark_add_outlined,
+                            size: 35,
+                            color: textColor,
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 15),
