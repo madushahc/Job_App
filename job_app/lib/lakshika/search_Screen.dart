@@ -1,7 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:job_app/lakshika/job_search_filters.dart';
+import 'package:job_app/madusha/customcard.dart'; // Import the Customcard screen
 
-class SearchScreen extends StatelessWidget {
+class SearchScreen extends StatefulWidget {
+  final bool isDarkMode;
+  final VoidCallback onThemeChanged;
+
+  SearchScreen({
+    Key? key,
+    required this.isDarkMode,
+    required this.onThemeChanged,
+  }) : super(key: key);
+
+  @override
+  _SearchScreenState createState() => _SearchScreenState();
+}
+
+class _SearchScreenState extends State<SearchScreen> {
   final List<String> popularRoles = [
     "Designer",
     "Administrator",
@@ -13,17 +28,55 @@ class SearchScreen extends StatelessWidget {
     "Developer",
     "SEO"
   ];
-  final bool isDarkMode;
-  final VoidCallback onThemeChanged;
-  SearchScreen({
-    super.key,
-    required this.isDarkMode,
-    required this.onThemeChanged,
-  });
+
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController
+        .addListener(_onSearchChanged); // Listen to search bar changes
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    setState(() {}); // Rebuild UI when search bar text changes
+  }
+
+  void _onSearchSubmitted(String value) {
+    if (value.isNotEmpty) {
+      _navigateToCustomCard(
+          value); // Navigate to Customcard with the search query
+    }
+  }
+
+  void _navigateToCustomCard(String searchQuery) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Customcard(
+          isDarkMode: widget.isDarkMode,
+          onThemeChanged: widget.onThemeChanged,
+          searchQuery: searchQuery, // Pass the search query
+        ),
+      ),
+    );
+  }
+
+  void _clearSearch() {
+    setState(() {
+      _searchController.clear();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Detects whether dark mode is enabled
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -68,24 +121,27 @@ class SearchScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               TextField(
+                controller: _searchController,
                 decoration: InputDecoration(
                   hintText: "Search job or position",
-                  prefixIcon: Icon(Icons.search,
-                      color: Colors.grey), // Always black icon
+                  prefixIcon: Icon(Icons.search, color: Colors.grey),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: Icon(Icons.close, color: Colors.grey),
+                          onPressed: _clearSearch,
+                        )
+                      : null,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.black), // Black border
+                    borderSide: BorderSide(color: Colors.black),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                        color: Colors.black), // Black border when inactive
+                    borderSide: BorderSide(color: Colors.black),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                        color: Colors.black,
-                        width: 2), // Thicker black border when focused
+                    borderSide: BorderSide(color: Colors.black, width: 2),
                   ),
                   filled: true,
                   fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
@@ -93,6 +149,7 @@ class SearchScreen extends StatelessWidget {
                 ),
                 style:
                     TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+                onSubmitted: _onSearchSubmitted,
               ),
               SizedBox(height: 10.0),
               Align(
@@ -138,9 +195,11 @@ class SearchScreen extends StatelessWidget {
                   ),
                   itemCount: popularRoles.length,
                   itemBuilder: (context, index) {
+                    final item = popularRoles[index];
                     return GestureDetector(
                       onTap: () {
-                        print("Selected: ${popularRoles[index]}");
+                        _navigateToCustomCard(
+                            item); // Navigate with the selected keyword
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -151,7 +210,7 @@ class SearchScreen extends StatelessWidget {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          popularRoles[index],
+                          item,
                           style: TextStyle(
                             fontWeight: FontWeight.w500,
                             color: isDarkMode ? Colors.white : Colors.black,
