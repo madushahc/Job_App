@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class JobDetailsPage extends StatefulWidget {
   final Map<String, dynamic> job;
@@ -22,6 +23,55 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
   List<String> _parseDescription(String description) {
     final List<String> lines = description.split('\n');
     return lines.where((line) => line.trim().isNotEmpty).toList();
+  }
+
+  // Method to show a dialog for selecting an apply option
+  Future<void> _showApplyOptionsDialog(BuildContext context) async {
+    final applyOptions = widget.job["apply_options"] ?? [];
+    if (applyOptions.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No application links available')),
+      );
+      return;
+    }
+
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Center(child: Text("Select an Apply Option")),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: applyOptions.map<Widget>((option) {
+                final String publisher =
+                    option["publisher"] ?? "Unknown Publisher";
+                final String applyLink = option["apply_link"] ?? "";
+
+                return ListTile(
+                  leading: Icon(Icons.open_in_new, color: Colors.blue),
+                  title: Text(publisher),
+                  onTap: () async {
+                    final Uri url = Uri.parse(Uri.decodeFull(applyLink));
+                    print("Trying to launch URL: $url"); // Debugging
+                    if (await canLaunch(url.toString())) {
+                      print("URL can be launched"); // Debugging
+                      await launch(url.toString());
+                    } else {
+                      print("URL cannot be launched"); // Debugging
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Could not launch the URL.')),
+                      );
+                    }
+                    Navigator.pop(context); // Close the dialog
+                  },
+                );
+              }).toList(),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -461,6 +511,21 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                 padding: const EdgeInsets.all(20),
                 child: _tabsContent[_selectedTab],
               ),
+              ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.blue),
+                  fixedSize: MaterialStateProperty.all(Size(200, 50)),
+                  alignment: Alignment.center,
+                ),
+                onPressed: () async {
+                  await _showApplyOptionsDialog(context);
+                },
+                child: Text(
+                  "Apply Now",
+                  style: TextStyle(fontSize: 20.0, color: Colors.white),
+                ),
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
