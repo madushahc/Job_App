@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:job_app/madusha/jobdetailscreen.dart';
-import 'package:amicons/amicons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Customcard extends StatefulWidget {
   final bool isDarkMode;
@@ -24,11 +24,51 @@ class _CustomcardState extends State<Customcard> {
   List<dynamic> jobs = [];
   bool isLoading = true;
   String errorMessage = '';
+  List<dynamic> savedJobs = [];
 
   @override
   void initState() {
     super.initState();
     fetchJobs();
+    loadSavedJobs();
+  }
+
+  // Load saved jobs from SharedPreferences
+  Future<void> loadSavedJobs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedJobsJson = prefs.getStringList('savedJobs') ?? [];
+    setState(() {
+      savedJobs = savedJobsJson.map((job) => jsonDecode(job)).toList();
+    });
+  }
+
+  // Save a job to SharedPreferences
+  Future<void> saveJob(Map<String, dynamic> job) async {
+    final prefs = await SharedPreferences.getInstance();
+    final jobJson = jsonEncode(job);
+    savedJobs.add(job);
+    await prefs.setStringList(
+        'savedJobs', savedJobs.map((j) => jsonEncode(j)).toList());
+    setState(() {});
+  }
+
+  // Remove a job from SharedPreferences
+  Future<void> removeJob(Map<String, dynamic> job) async {
+    final prefs = await SharedPreferences.getInstance();
+    savedJobs.removeWhere((j) => j['job_id'] == job['job_id']);
+    await prefs.setStringList(
+        'savedJobs', savedJobs.map((j) => jsonEncode(j)).toList());
+    setState(() {});
+  }
+
+  // Toggle save state for a job
+  void _toggleSave(int index) async {
+    final job = jobs[index];
+    if (savedJobs.any((j) => j['job_id'] == job['job_id'])) {
+      await removeJob(job); // Remove job if already saved
+    } else {
+      await saveJob(job); // Save job if not already saved
+    }
   }
 
   Future<void> fetchJobs() async {
@@ -45,7 +85,7 @@ class _CustomcardState extends State<Customcard> {
     final headers = {
       'x-rapidapi-host': 'jsearch.p.rapidapi.com',
       'x-rapidapi-key':
-          '45e6271b49msh02064a264dbc139p15c911jsnb36740740f5b', // Replace with actual key
+          '02e57dea4amsh5d35b1f8ef8ac3ap1c0bdbjsn7d6f596d0010', // Replace with actual key
     };
 
     try {
@@ -144,8 +184,19 @@ class _CustomcardState extends State<Customcard> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        JobDetailsPage(job: job),
+                                    builder: (context) => JobDetailsPage(
+                                      job: job,
+                                      isSaved: savedJobs.any((j) =>
+                                          j['job_id'] ==
+                                          job['job_id']), // Pass saved state
+                                      onSaveChanged: (isSaved) {
+                                        if (isSaved) {
+                                          saveJob(job); // Save the job
+                                        } else {
+                                          removeJob(job); // Remove the job
+                                        }
+                                      },
+                                    ),
                                   ),
                                 );
                               },
@@ -225,17 +276,28 @@ class _CustomcardState extends State<Customcard> {
                                             ),
                                           ),
                                           // Save Icon
-                                          Icon(
-                                            Amicons.vuesax_save_2,
-                                            size: 30.0,
-                                            color: iconColor,
+                                          IconButton(
+                                            icon: Icon(
+                                              savedJobs.any((j) =>
+                                                      j['job_id'] ==
+                                                      job['job_id'])
+                                                  ? Icons.bookmark_added_rounded
+                                                  : Icons.bookmark_add_outlined,
+                                              size: 30.0,
+                                              color: savedJobs.any((j) =>
+                                                      j['job_id'] ==
+                                                      job['job_id'])
+                                                  ? Colors.blue
+                                                  : Colors.grey,
+                                            ),
+                                            onPressed: () => _toggleSave(index),
                                           ),
                                         ],
                                       ),
                                       SizedBox(height: 12.0),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
+                                      Wrap(
+                                        spacing: 8.0,
+                                        runSpacing: 8.0,
                                         children: [
                                           if (industry.isNotEmpty)
                                             _buildTag(industry, tagBackground,
