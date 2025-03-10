@@ -58,7 +58,10 @@ class _MyAppState extends State<MyApp> {
         isDarkMode: isDarkMode,
         onThemeChanged: () => toggleTheme(!isDarkMode),
       ),
-      SavedPage(),
+      SavedPage(
+        isDarkMode: isDarkMode,
+        onThemeChanged: () => toggleTheme(!isDarkMode),
+      ),
       ProfilePage(),
       Settings.Settings(
         isDarkMode: isDarkMode,

@@ -3,7 +3,15 @@ import 'package:url_launcher/url_launcher.dart';
 
 class JobDetailsPage extends StatefulWidget {
   final Map<String, dynamic> job;
-  const JobDetailsPage({super.key, required this.job});
+  final bool isSaved; // Add this
+  final Function(bool) onSaveChanged;
+  // Add this
+  const JobDetailsPage({
+    super.key,
+    required this.job,
+    required this.isSaved, // Add this
+    required this.onSaveChanged,
+  });
 
   @override
   _JobDetailsPageState createState() => _JobDetailsPageState();
@@ -12,6 +20,12 @@ class JobDetailsPage extends StatefulWidget {
 class _JobDetailsPageState extends State<JobDetailsPage> {
   int _selectedTab = 0; // To keep track of the selected tab
   bool _isBookmarked = false; // To track bookmark state
+
+  @override
+  void initState() {
+    super.initState();
+    _isBookmarked = widget.isSaved; // Initialize with the passed value
+  }
 
   // Helper function to remove HTML tags from a string
   String _removeHtmlTags(String html) {
@@ -26,7 +40,8 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
   }
 
   // Method to show a dialog for selecting an apply option
-  Future<void> _showApplyOptionsDialog(BuildContext context) async {
+  Future<void> _showApplyOptionsDialog(
+      BuildContext context, bool isDarkMode) async {
     final applyOptions = widget.job["apply_options"] ?? [];
     if (applyOptions.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -39,7 +54,11 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Center(child: Text("Select an Apply Option")),
+          title: Center(
+              child: Text(
+            "Select an Apply Option",
+            style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
+          )),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -78,7 +97,6 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final Color textColor = isDarkMode ? Colors.white : Colors.black87;
-
     final title = widget.job["job_title"] ?? "";
     final salary = widget.job["job_min_salary"]?.toString() ?? "";
     final company = widget.job["employer_name"] ?? "";
@@ -415,6 +433,8 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                           onPressed: () {
                             setState(() {
                               _isBookmarked = !_isBookmarked;
+                              widget.onSaveChanged(
+                                  _isBookmarked); // Notify the parent
                             });
                           },
                           icon: Icon(
@@ -518,7 +538,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                   alignment: Alignment.center,
                 ),
                 onPressed: () async {
-                  await _showApplyOptionsDialog(context);
+                  await _showApplyOptionsDialog(context, isDarkMode);
                 },
                 child: Text(
                   "Apply Now",
