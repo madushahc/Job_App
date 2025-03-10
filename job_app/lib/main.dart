@@ -12,7 +12,9 @@ import 'package:job_app/madusha/settings.dart' as Settings;
 import 'package:job_app/chatbot/chatbot_main.dart'; //amantha
 import 'package:amicons/amicons.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  runApp(const MyApp());
+}
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
