@@ -1,4 +1,6 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'firebase_options.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:job_app/components/add_post.dart';
 import 'package:job_app/pages/explore_page.dart';
@@ -12,7 +14,10 @@ import 'package:job_app/madusha/settings.dart' as Settings;
 import 'package:job_app/chatbot/chatbot_main.dart'; //amantha
 import 'package:amicons/amicons.dart';
 
-void main() {
+void main() async {
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
