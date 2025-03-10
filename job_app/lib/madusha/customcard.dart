@@ -1,17 +1,92 @@
-import 'package:amicons/amicons.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:job_app/madusha/jobdetailscreen.dart';
+import 'package:amicons/amicons.dart';
 
-class CustomCard extends StatefulWidget {
-  const CustomCard({super.key});
+class Customcard extends StatefulWidget {
+  final bool isDarkMode;
+  final VoidCallback onThemeChanged;
+  final String searchQuery; // Add this line
+
+  const Customcard({
+    super.key,
+    required this.isDarkMode,
+    required this.onThemeChanged,
+    required this.searchQuery, // Add this line
+  });
 
   @override
-  State<CustomCard> createState() => _CustomCardState();
+  State<Customcard> createState() => _CustomcardState();
 }
 
-class _CustomCardState extends State<CustomCard> {
+class _CustomcardState extends State<Customcard> {
+  List<dynamic> jobs = [];
+  bool isLoading = true;
+  String errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchJobs();
+  }
+
+  Future<void> fetchJobs() async {
+    print("Fetching job details...");
+
+    final String query =
+        widget.searchQuery; // Use the search query from the widget
+    const int numPages = 20; // Increase for more jobs
+
+    final String url =
+        'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
+    final Uri uri = Uri.parse(url);
+
+    final headers = {
+      'x-rapidapi-host': 'jsearch.p.rapidapi.com',
+      'x-rapidapi-key':
+          '45e6271b49msh02064a264dbc139p15c911jsnb36740740f5b', // Replace with actual key
+    };
+
+    try {
+      final response = await http.get(uri, headers: headers);
+
+      print("Response Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final body = response.body;
+        final json = jsonDecode(body);
+        print("Fetched Data: $json");
+
+        if (json['data'] != null && json['data'].isNotEmpty) {
+          setState(() {
+            jobs = json['data']; // Store multiple jobs
+            isLoading = false;
+          });
+          print("Jobs list fetched successfully");
+        } else {
+          setState(() {
+            isLoading = false;
+            errorMessage = "No jobs found";
+          });
+        }
+      } else {
+        setState(() {
+          isLoading = false;
+          errorMessage = "Failed to fetch job details: ${response.statusCode}";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        errorMessage = "Error fetching job details: $e";
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Determine the current theme (light or dark)
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final Color textColor = isDarkMode ? Colors.white : Colors.black87;
     final Color subtitleColor =
@@ -24,133 +99,217 @@ class _CustomCardState extends State<CustomCard> {
         isDarkMode ? Colors.blueAccent : Colors.blueAccent;
     final Color locationColor = isDarkMode ? Colors.white70 : Colors.black87;
 
-    return Center(
-      child: Container(
-        height: 220.0,
-        width: 380.0,
-        child: Card(
-          color: cardColor,
-          elevation: 4.0,
-          margin: EdgeInsets.only(right: 16.0, top: 12.0, bottom: 12.0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              spacing: 6.0,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Profile Image
-                    Container(
-                      width: 50.0,
-                      height: 50.0,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          image: AssetImage("assets/profile.jpeg"),
-                          fit: BoxFit.cover,
-                        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+            "${widget.searchQuery}"), // Display the search query in the AppBar
+        centerTitle: true, // Center the title
+      ),
+      body: Column(
+        children: [
+          SizedBox(height: 10.0), // Reduced extra spacing
+          isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                ) // Show loading indicator while fetching
+              : errorMessage.isNotEmpty
+                  ? Center(
+                      child: Text(errorMessage),
+                    ) // Show error message if fetch failed
+                  : Expanded(
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        padding: EdgeInsets.only(
+                            left: 15.0, right: 15.0, bottom: 15.0),
+                        itemCount: jobs.length,
+                        itemBuilder: (context, index) {
+                          final job = jobs[index];
+                          final title = job["job_title"] ?? "";
+                          final company = job["employer_name"] ?? "";
+                          final logo = job["employer_logo"];
+                          final city = job["job_city"] ?? "";
+                          final state = job["job_state"] ?? "";
+                          final country = job["job_country"] ?? "";
+                          final currency = job["job_salary_currency"] ?? "";
+                          final salary =
+                              job["job_min_salary"]?.toString() ?? "";
+                          final position = job["job_job_title"] ?? "";
+                          final industry = job["employer_company_type"] ?? "";
+                          final type = job["job_employment_type"] ?? "";
+
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 15.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        JobDetailsPage(job: job),
+                                  ),
+                                );
+                              },
+                              child: Card(
+                                color: cardColor,
+                                elevation: 4.0,
+                                margin: EdgeInsets.only(right: 16.0, top: 12.0),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          // Profile Image
+                                          logo != null
+                                              ? Container(
+                                                  width: 50.0,
+                                                  height: 50.0,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    image: DecorationImage(
+                                                      image: NetworkImage(logo),
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                )
+                                              : Container(
+                                                  width: 50.0,
+                                                  height: 50.0,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: Colors.grey[300],
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.image_not_supported,
+                                                    size: 30.0,
+                                                    color: Colors.grey[600],
+                                                  ),
+                                                ),
+                                          SizedBox(width: 12.0),
+                                          // Job Title & Company
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                if (title.isNotEmpty)
+                                                  Text(
+                                                    title,
+                                                    style: TextStyle(
+                                                      fontSize: 18.0,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: textColor,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                if (company.isNotEmpty)
+                                                  Text(
+                                                    company,
+                                                    style: TextStyle(
+                                                      fontSize: 16.0,
+                                                      color: subtitleColor,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                          // Save Icon
+                                          Icon(
+                                            Amicons.vuesax_save_2,
+                                            size: 30.0,
+                                            color: iconColor,
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 12.0),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          if (industry.isNotEmpty)
+                                            _buildTag(industry, tagBackground,
+                                                tagTextColor),
+                                          if (type.isNotEmpty)
+                                            _buildTag(type, tagBackground,
+                                                tagTextColor),
+                                          if (position.isNotEmpty)
+                                            _buildTag(position, tagBackground,
+                                                tagTextColor),
+                                        ],
+                                      ),
+                                      SizedBox(height: 10.0),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          if (currency.isNotEmpty ||
+                                              salary.isNotEmpty)
+                                            Flexible(
+                                              flex:
+                                                  1, // Adjust flex value as needed
+                                              child: Text(
+                                                "$currency $salary",
+                                                style: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: textColor,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          Flexible(
+                                            flex:
+                                                2, // Give more space to the location
+                                            child: Row(
+                                              children: [
+                                                Icon(Icons.location_on,
+                                                    color: Colors.red,
+                                                    size: 20.0),
+                                                SizedBox(width: 5.0),
+                                                Expanded(
+                                                  // Use Expanded inside the Row to handle text overflow
+                                                  child: Text(
+                                                    "$city, $state, $country",
+                                                    style: TextStyle(
+                                                      fontSize: 16.0,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: locationColor,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                    SizedBox(width: 12.0),
-                    // Job Title & Company
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Software Engineer",
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                              color: textColor,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            "Microsoft",
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              color: subtitleColor,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Save Icon
-                    Icon(
-                      Amicons.vuesax_save_2,
-                      size: 30.0,
-                      color: iconColor,
-                    ),
-                  ],
-                ),
-                SizedBox(height: 12.0),
-                // Job Tags
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildTag("IT", tagBackground, tagTextColor),
-                    _buildTag("Full Time", tagBackground, tagTextColor),
-                    _buildTag("Junior", tagBackground, tagTextColor),
-                  ],
-                ),
-                SizedBox(height: 10.0),
-                // Salary & Location
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          " USD",
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
-                        ),
-                        SizedBox(width: 5.0),
-                        Text(
-                          "1000 ",
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Icon(Icons.location_on, color: Colors.red, size: 20.0),
-                        SizedBox(width: 5.0),
-                        Text(
-                          "California, USA",
-                          style: TextStyle(
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.w600,
-                            color: locationColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
+        ],
       ),
     );
   }
 
-  // Badge Widget for Job Type Tags
   Widget _buildTag(String text, Color background, Color textColor) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
