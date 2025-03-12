@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:job_app/home_page.dart';
 
@@ -13,6 +15,69 @@ class PopularCompanies extends StatefulWidget {
 
   @override
   State<PopularCompanies> createState() => _PopularCompaniesState();
+}
+
+List<dynamic> jobs = [];
+bool isLoading = true;
+String errorMessage = '';
+
+@override
+void initState() {
+  super.initState();
+  fetchJobs();
+}
+
+Future<void> fetchJobs() async {
+  print("Fetching job details...");
+
+  const String query = "jobs"; // General query for all job types
+  const int numPages = 1; // Increase for more jobs
+
+  final String url =
+      'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
+  final Uri uri = Uri.parse(url);
+
+  final headers = {
+    'x-rapidapi-host': 'jsearch.p.rapidapi.com',
+    'x-rapidapi-key':
+        'b82235208amsh8a43112a2c5c8e4p19ceb3jsn0ceb21592560', // Replace with actual key
+  };
+
+  try {
+    final response = await http.get(uri, headers: headers);
+
+    print("Response Status Code: ${response.statusCode}");
+    print("Response Body: ${response.body}");
+
+    if (response.statusCode == 200) {
+      final body = response.body;
+      final json = jsonDecode(body);
+      print("Fetched Data: $json");
+
+      if (json['data'] != null && json['data'].isNotEmpty) {
+        setState(() {
+          jobs = json['data']; // Store multiple jobs
+          isLoading = false;
+        });
+        print("Jobs list fetched successfully");
+      } else {
+        setState(() {
+          isLoading = false;
+          errorMessage = "No jobs found";
+        });
+      }
+    } else {
+      setState(() {
+        isLoading = false;
+        errorMessage = "Failed to fetch job details: ${response.statusCode}";
+      });
+    }
+  } catch (e) {
+    setState(() {
+      isLoading = false;
+      errorMessage = "Error fetching job details: $e";
+    });
+  }
 }
 
 class _PopularCompaniesState extends State<PopularCompanies> {
