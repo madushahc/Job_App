@@ -14,13 +14,13 @@ class ChatbotMain extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: ThemeData.light().copyWith(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 41, 182, 246),
+          seedColor: const Color.fromARGB(255, 38, 129, 240),
           brightness: Brightness.light,
         ),
       ),
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 39, 237, 255),
+          seedColor: const Color.fromARGB(255, 38, 129, 240),
         ),
       ),
       home: const HomePage(),
