@@ -53,7 +53,9 @@ class _SavedPageState extends State<SavedPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: widget.isDarkMode ? Colors.black : Colors.blue[50],
       appBar: AppBar(
+        backgroundColor: widget.isDarkMode ? Colors.black : Colors.blue[50],
         title: Center(
             child: Text(
           "Saved Jobs",
