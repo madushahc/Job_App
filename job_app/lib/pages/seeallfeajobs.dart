@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:job_app/pages/jobdetailscreen.dart';
-import 'package:amicons/amicons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SeeAllFeaturedJobs extends StatefulWidget {
@@ -32,7 +31,6 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
     loadSavedJobs();
   }
 
-  // Load saved jobs from SharedPreferences
   Future<void> loadSavedJobs() async {
     final prefs = await SharedPreferences.getInstance();
     final savedJobsJson = prefs.getStringList('savedJobs') ?? [];
@@ -41,7 +39,6 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
     });
   }
 
-  // Save a job to SharedPreferences
   Future<void> saveJob(Map<String, dynamic> job) async {
     final prefs = await SharedPreferences.getInstance();
     final jobJson = jsonEncode(job);
@@ -51,7 +48,6 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
     setState(() {});
   }
 
-  // Remove a job from SharedPreferences
   Future<void> removeJob(Map<String, dynamic> job) async {
     final prefs = await SharedPreferences.getInstance();
     savedJobs.removeWhere((j) => j['job_id'] == job['job_id']);
@@ -60,49 +56,38 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
     setState(() {});
   }
 
-  // Toggle save state for a job
   void _toggleSave(int index) async {
     final job = jobs[index];
     if (savedJobs.any((j) => j['job_id'] == job['job_id'])) {
-      await removeJob(job); // Remove job if already saved
+      await removeJob(job);
     } else {
-      await saveJob(job); // Save job if not already saved
+      await saveJob(job);
     }
   }
 
   Future<void> fetchJobs() async {
-    print("Fetching job details...");
-
-    const String query = "Jobs"; // Combined query
-    const int numPages = 20; // Increase for more jobs
-
+    const String query = "Jobs";
+    const int numPages = 20;
     final String url =
         'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
     final Uri uri = Uri.parse(url);
-
     final headers = {
       'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-      'x-rapidapi-key':
-          '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052', // Replace with actual key
+      'x-rapidapi-key': '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052',
     };
 
     try {
       final response = await http.get(uri, headers: headers);
 
-      print("Response Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
-
       if (response.statusCode == 200) {
         final body = response.body;
         final json = jsonDecode(body);
-        print("Fetched Data: $json");
 
         if (json['data'] != null && json['data'].isNotEmpty) {
           setState(() {
-            jobs = json['data']; // Store multiple jobs
+            jobs = json['data'];
             isLoading = false;
           });
-          print("Jobs list fetched successfully");
         } else {
           setState(() {
             isLoading = false;
@@ -130,7 +115,6 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
     final Color subtitleColor =
         isDarkMode ? Colors.grey[400]! : Colors.grey[700]!;
     final Color cardColor = isDarkMode ? Colors.grey[800]! : Colors.white;
-    final Color iconColor = isDarkMode ? Colors.white : Colors.blueAccent;
     final Color tagBackground =
         isDarkMode ? Colors.blueGrey[800]! : Colors.blue[50]!;
     final Color tagTextColor =
@@ -143,15 +127,15 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
       ),
       body: Column(
         children: [
-          SizedBox(height: 10.0), // Reduced extra spacing
+          SizedBox(height: 10.0),
           isLoading
               ? const Center(
                   child: CircularProgressIndicator(),
-                ) // Show loading indicator while fetching
+                )
               : errorMessage.isNotEmpty
                   ? Center(
                       child: Text(errorMessage),
-                    ) // Show error message if fetch failed
+                    )
                   : Expanded(
                       child: ListView.builder(
                         scrollDirection: Axis.vertical,
@@ -182,14 +166,13 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
                                   MaterialPageRoute(
                                     builder: (context) => JobDetailsPage(
                                       job: job,
-                                      isSaved: savedJobs.any((j) =>
-                                          j['job_id'] ==
-                                          job['job_id']), // Pass saved state
+                                      isSaved: savedJobs.any(
+                                          (j) => j['job_id'] == job['job_id']),
                                       onSaveChanged: (isSaved) {
                                         if (isSaved) {
-                                          saveJob(job); // Save the job
+                                          saveJob(job);
                                         } else {
-                                          removeJob(job); // Remove the job
+                                          removeJob(job);
                                         }
                                       },
                                     ),
@@ -213,7 +196,6 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          // Profile Image
                                           logo != null
                                               ? Container(
                                                   width: 50.0,
@@ -240,7 +222,6 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
                                                   ),
                                                 ),
                                           SizedBox(width: 12.0),
-                                          // Job Title & Company
                                           Expanded(
                                             child: Column(
                                               crossAxisAlignment:
@@ -271,7 +252,6 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
                                               ],
                                             ),
                                           ),
-                                          // Save Icon
                                           IconButton(
                                             icon: Icon(
                                               savedJobs.any((j) =>
@@ -314,8 +294,7 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
                                           if (currency.isNotEmpty ||
                                               salary.isNotEmpty)
                                             Flexible(
-                                              flex:
-                                                  1, // Adjust flex value as needed
+                                              flex: 1,
                                               child: Text(
                                                 "$currency $salary",
                                                 style: TextStyle(
@@ -327,8 +306,7 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
                                               ),
                                             ),
                                           Flexible(
-                                            flex:
-                                                2, // Give more space to the location
+                                            flex: 2,
                                             child: Row(
                                               children: [
                                                 Icon(Icons.location_on,
@@ -336,7 +314,6 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
                                                     size: 20.0),
                                                 SizedBox(width: 5.0),
                                                 Expanded(
-                                                  // Use Expanded inside the Row to handle text overflow
                                                   child: Text(
                                                     "$city, $state, $country",
                                                     style: TextStyle(

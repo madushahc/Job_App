@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:job_app/pages/seeallfeajobs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'jobdetailscreen.dart'; // Import your JobDetailsPage
+import 'jobdetailscreen.dart';
 import 'package:http/http.dart' as http;
 
 class FeaturedJobs extends StatefulWidget {
@@ -32,7 +32,6 @@ class _FeaturedJobsState extends State<FeaturedJobs> {
     loadSavedJobs();
   }
 
-  // Load saved jobs from SharedPreferences
   Future<void> loadSavedJobs() async {
     final prefs = await SharedPreferences.getInstance();
     final savedJobsJson = prefs.getStringList('savedJobs') ?? [];
@@ -41,7 +40,6 @@ class _FeaturedJobsState extends State<FeaturedJobs> {
     });
   }
 
-  // Save a job to SharedPreferences
   Future<void> saveJob(Map<String, dynamic> job) async {
     final prefs = await SharedPreferences.getInstance();
     final jobJson = jsonEncode(job);
@@ -51,7 +49,6 @@ class _FeaturedJobsState extends State<FeaturedJobs> {
     setState(() {});
   }
 
-  // Remove a job from SharedPreferences
   Future<void> removeJob(Map<String, dynamic> job) async {
     final prefs = await SharedPreferences.getInstance();
     savedJobs.removeWhere((j) => j['job_id'] == job['job_id']);
@@ -60,22 +57,18 @@ class _FeaturedJobsState extends State<FeaturedJobs> {
     setState(() {});
   }
 
-  // Toggle save state for a job
   void _toggleSave(int index) async {
     final job = jobs[index];
     if (savedJobs.any((j) => j['job_id'] == job['job_id'])) {
-      await removeJob(job); // Remove job if already saved
+      await removeJob(job);
     } else {
-      await saveJob(job); // Save job if not already saved
+      await saveJob(job);
     }
   }
 
-  // Fetch jobs from the API
   Future<void> fetchJobs() async {
-    print("Fetching job details...");
-
-    const String query = "jobs"; // General query for all job types
-    const int numPages = 1; // Increase for more jobs
+    const String query = "jobs";
+    const int numPages = 1;
 
     final String url =
         'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
@@ -90,20 +83,15 @@ class _FeaturedJobsState extends State<FeaturedJobs> {
     try {
       final response = await http.get(uri, headers: headers);
 
-      print("Response Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
-
       if (response.statusCode == 200) {
         final body = response.body;
         final json = jsonDecode(body);
-        print("Fetched Data: $json");
 
         if (json['data'] != null && json['data'].isNotEmpty) {
           setState(() {
-            jobs = json['data']; // Store multiple jobs
+            jobs = json['data'];
             isLoading = false;
           });
-          print("Jobs list fetched successfully");
         } else {
           setState(() {
             isLoading = false;
@@ -167,17 +155,17 @@ class _FeaturedJobsState extends State<FeaturedJobs> {
             ],
           ),
         ),
-        SizedBox(height: 10.0), // Reduced extra spacing
+        SizedBox(height: 10.0),
         isLoading
             ? const Center(
                 child: CircularProgressIndicator(),
-              ) // Show loading indicator while fetching
+              )
             : errorMessage.isNotEmpty
                 ? Center(
                     child: Text(errorMessage),
-                  ) // Show error message if fetch failed
+                  )
                 : SizedBox(
-                    height: 200, // Set a fixed height for the horizontal list
+                    height: 200,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       padding: EdgeInsets.only(left: 15.0, bottom: 15.0),
@@ -199,9 +187,7 @@ class _FeaturedJobsState extends State<FeaturedJobs> {
                         return Padding(
                           padding: EdgeInsets.only(right: 15.0),
                           child: SizedBox(
-                            width: MediaQuery.of(context)
-                                .size
-                                .width, // Set a bounded width for each item
+                            width: MediaQuery.of(context).size.width,
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -209,14 +195,13 @@ class _FeaturedJobsState extends State<FeaturedJobs> {
                                   MaterialPageRoute(
                                     builder: (context) => JobDetailsPage(
                                       job: job,
-                                      isSaved: savedJobs.any((j) =>
-                                          j['job_id'] ==
-                                          job['job_id']), // Pass saved state
+                                      isSaved: savedJobs.any(
+                                          (j) => j['job_id'] == job['job_id']),
                                       onSaveChanged: (isSaved) {
                                         if (isSaved) {
-                                          saveJob(job); // Save the job
+                                          saveJob(job);
                                         } else {
-                                          removeJob(job); // Remove the job
+                                          removeJob(job);
                                         }
                                       },
                                     ),
@@ -243,7 +228,6 @@ class _FeaturedJobsState extends State<FeaturedJobs> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          // Profile Image
                                           logo != null
                                               ? Container(
                                                   width: 50.0,
@@ -270,7 +254,6 @@ class _FeaturedJobsState extends State<FeaturedJobs> {
                                                   ),
                                                 ),
                                           SizedBox(width: 12.0),
-                                          // Job Title & Company
                                           Expanded(
                                             child: Column(
                                               crossAxisAlignment:
@@ -301,7 +284,6 @@ class _FeaturedJobsState extends State<FeaturedJobs> {
                                               ],
                                             ),
                                           ),
-
                                           IconButton(
                                             icon: Icon(
                                               savedJobs.any((j) =>
@@ -344,8 +326,7 @@ class _FeaturedJobsState extends State<FeaturedJobs> {
                                           if (currency.isNotEmpty ||
                                               salary.isNotEmpty)
                                             Flexible(
-                                              flex:
-                                                  1, // Adjust flex value as needed
+                                              flex: 1,
                                               child: Text(
                                                 "$currency $salary",
                                                 style: TextStyle(
@@ -357,8 +338,7 @@ class _FeaturedJobsState extends State<FeaturedJobs> {
                                               ),
                                             ),
                                           Flexible(
-                                            flex:
-                                                2, // Give more space to the location
+                                            flex: 2,
                                             child: Row(
                                               children: [
                                                 Icon(Icons.location_on,
@@ -366,7 +346,6 @@ class _FeaturedJobsState extends State<FeaturedJobs> {
                                                     size: 20.0),
                                                 SizedBox(width: 5.0),
                                                 Expanded(
-                                                  // Use Expanded inside the Row to handle text overflow
                                                   child: Text(
                                                     "$city, $state, $country",
                                                     style: TextStyle(

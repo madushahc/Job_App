@@ -7,13 +7,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Filterpage extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback onThemeChanged;
-  final Map<String, dynamic> filters; // Filters are received here
+  final Map<String, dynamic> filters;
 
   const Filterpage({
     super.key,
     required this.isDarkMode,
     required this.onThemeChanged,
-    this.filters = const {}, // Default to an empty map
+    this.filters = const {},
   });
 
   @override
@@ -22,7 +22,7 @@ class Filterpage extends StatefulWidget {
 
 class _FilterpageState extends State<Filterpage> {
   List<dynamic> jobs = [];
-  List<dynamic> filteredJobs = []; // Stores filtered jobs
+  List<dynamic> filteredJobs = [];
   bool isLoading = true;
   String errorMessage = '';
   List<dynamic> savedJobs = [];
@@ -34,43 +34,28 @@ class _FilterpageState extends State<Filterpage> {
     loadSavedJobs();
   }
 
-  // Fetch jobs from the API
   Future<void> fetchJobs() async {
-    print("Fetching job details...");
-
-    // Use the filters to construct the query
-    final String query =
-        widget.filters['companyType'] ?? "software engineer"; // Default query
-    const int numPages = 20; // Number of pages to fetch
-
+    final String query = widget.filters['companyType'] ?? "software engineer";
+    const int numPages = 20;
     final String url =
         'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
     final Uri uri = Uri.parse(url);
-
     final headers = {
       'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-      'x-rapidapi-key':
-          '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052', // Replace with your actual API key
+      'x-rapidapi-key': '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052',
     };
 
     try {
       final response = await http.get(uri, headers: headers);
-
-      print("Response Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
-
       if (response.statusCode == 200) {
         final body = response.body;
         final json = jsonDecode(body);
-        print("Fetched Data: $json");
-
         if (json['data'] != null && json['data'].isNotEmpty) {
           setState(() {
-            jobs = json['data']; // Store all jobs
-            applyFilters(); // Apply filters to the fetched jobs
+            jobs = json['data'];
+            applyFilters();
             isLoading = false;
           });
-          print("Jobs list fetched successfully");
         } else {
           setState(() {
             isLoading = false;
@@ -94,37 +79,18 @@ class _FilterpageState extends State<Filterpage> {
   void applyFilters() {
     setState(() {
       filteredJobs = jobs.where((job) {
-        // Debug logs
-        print("Job: ${job['job_title']}");
-        print(
-            "Company Type: ${job['employer_name']}, Filter: ${widget.filters['companyType']}");
-        print(
-            "Location: ${job['job_city']}, ${job['job_state']}, ${job['job_country']}, Filter: ${widget.filters['location']}");
-        print(
-            "Job Type: ${job['job_employment_type']}, Filter: ${widget.filters['jobTypes']}");
-
-        // Filter by company type
         final companyTypeMatch = widget.filters['companyType'] == 'Any' ||
-            job['employer_name'] == widget.filters['companyType'];
+            job['job_title'] == widget.filters['companyType'];
 
-        // Filter by location
         final locationMatch = widget.filters['location'] == 'Any' ||
-            (job['job_city'] != null &&
-                job['job_city'] == widget.filters['location']) ||
             (job['job_state'] != null &&
-                job['job_state'] == widget.filters['location']) ||
-            (job['job_country'] != null &&
-                job['job_country'] == widget.filters['location']);
+                job['job_state'] == widget.filters['location']);
 
-        // Filter by job type
         final jobTypeMatch = widget.filters['jobTypes'].isEmpty ||
             widget.filters['jobTypes'].contains(job['job_employment_type']);
 
         return companyTypeMatch && locationMatch && jobTypeMatch;
       }).toList();
-
-      // Debug log to check filtered jobs
-      print("Filtered Jobs: ${filteredJobs.length}");
     });
   }
 
@@ -132,11 +98,10 @@ class _FilterpageState extends State<Filterpage> {
   void didUpdateWidget(covariant Filterpage oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.filters != widget.filters) {
-      applyFilters(); // Re-apply filters when they change
+      applyFilters();
     }
   }
 
-  // Load saved jobs from SharedPreferences
   Future<void> loadSavedJobs() async {
     final prefs = await SharedPreferences.getInstance();
     final savedJobsJson = prefs.getStringList('savedJobs') ?? [];
@@ -145,7 +110,6 @@ class _FilterpageState extends State<Filterpage> {
     });
   }
 
-  // Save a job to SharedPreferences
   Future<void> saveJob(Map<String, dynamic> job) async {
     final prefs = await SharedPreferences.getInstance();
     final jobJson = jsonEncode(job);
@@ -155,7 +119,6 @@ class _FilterpageState extends State<Filterpage> {
     setState(() {});
   }
 
-  // Remove a job from SharedPreferences
   Future<void> removeJob(Map<String, dynamic> job) async {
     final prefs = await SharedPreferences.getInstance();
     savedJobs.removeWhere((j) => j['job_id'] == job['job_id']);
@@ -164,13 +127,12 @@ class _FilterpageState extends State<Filterpage> {
     setState(() {});
   }
 
-  // Toggle save state for a job
   void _toggleSave(int index) async {
     final job = filteredJobs[index];
     if (savedJobs.any((j) => j['job_id'] == job['job_id'])) {
-      await removeJob(job); // Remove job if already saved
+      await removeJob(job);
     } else {
-      await saveJob(job); // Save job if not already saved
+      await saveJob(job);
     }
   }
 
@@ -181,7 +143,6 @@ class _FilterpageState extends State<Filterpage> {
     final Color subtitleColor =
         isDarkMode ? Colors.grey[400]! : Colors.grey[700]!;
     final Color cardColor = isDarkMode ? Colors.grey[800]! : Colors.white;
-    final Color iconColor = isDarkMode ? Colors.white : Colors.blueAccent;
     final Color tagBackground =
         isDarkMode ? Colors.blueGrey[800]! : Colors.blue[50]!;
     final Color tagTextColor =
@@ -190,227 +151,250 @@ class _FilterpageState extends State<Filterpage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Filter Results"), // Display the search query in the AppBar
-        centerTitle: true, // Center the title
+        title: Text("Filter Results"),
+        centerTitle: true,
       ),
       body: Column(
         children: [
-          SizedBox(height: 10.0), // Reduced extra spacing
+          SizedBox(height: 10.0),
           isLoading
               ? const Center(
                   child: CircularProgressIndicator(),
-                ) // Show loading indicator while fetching
+                )
               : errorMessage.isNotEmpty
                   ? Center(
                       child: Text(errorMessage),
-                    ) // Show error message if fetch failed
-                  : Expanded(
-                      child: ListView.builder(
-                        scrollDirection: Axis.vertical,
-                        padding: EdgeInsets.only(
-                            left: 15.0, right: 15.0, bottom: 15.0),
-                        itemCount: filteredJobs.length,
-                        itemBuilder: (context, index) {
-                          final job = filteredJobs[index];
-                          final title = job["job_title"] ?? "";
-                          final company = job["employer_name"] ?? "";
-                          final logo = job["employer_logo"];
-                          final city = job["job_city"] ?? "";
-                          final state = job["job_state"] ?? "";
-                          final country = job["job_country"] ?? "";
-                          final currency = job["job_salary_currency"] ?? "";
-                          final salary =
-                              job["job_min_salary"]?.toString() ?? "";
-                          final position = job["job_job_title"] ?? "";
-                          final industry = job["employer_company_type"] ?? "";
-                          final type = job["job_employment_type"] ?? "";
+                    )
+                  : filteredJobs.isEmpty
+                      ? Center(
+                          child: Text(
+                            "No jobs found",
+                            style: TextStyle(
+                              fontSize: 18.0,
+                              color: textColor,
+                            ),
+                          ),
+                        )
+                      : Expanded(
+                          child: ListView.builder(
+                            scrollDirection: Axis.vertical,
+                            padding: EdgeInsets.only(
+                                left: 15.0, right: 15.0, bottom: 15.0),
+                            itemCount: filteredJobs.length,
+                            itemBuilder: (context, index) {
+                              final job = filteredJobs[index];
+                              final title = job["job_title"] ?? "";
+                              final company = job["employer_name"] ?? "";
+                              final logo = job["employer_logo"];
+                              final city = job["job_city"] ?? "";
+                              final state = job["job_state"] ?? "";
+                              final country = job["job_country"] ?? "";
+                              final currency = job["job_salary_currency"] ?? "";
+                              final salary =
+                                  job["job_min_salary"]?.toString() ?? "";
+                              final position = job["job_job_title"] ?? "";
+                              final industry =
+                                  job["employer_company_type"] ?? "";
+                              final type = job["job_employment_type"] ?? "";
 
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 15.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => JobDetailsPage(
-                                      job: job,
-                                      isSaved: savedJobs.any(
-                                          (j) => j['job_id'] == job['job_id']),
-                                      onSaveChanged: (isSaved) {
-                                        if (isSaved) {
-                                          saveJob(job); // Save the job
-                                        } else {
-                                          removeJob(job); // Remove the job
-                                        }
-                                      },
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: 15.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => JobDetailsPage(
+                                          job: job,
+                                          isSaved: savedJobs.any((j) =>
+                                              j['job_id'] == job['job_id']),
+                                          onSaveChanged: (isSaved) {
+                                            if (isSaved) {
+                                              saveJob(job);
+                                            } else {
+                                              removeJob(job);
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Card(
+                                    color: cardColor,
+                                    elevation: 4.0,
+                                    margin:
+                                        EdgeInsets.only(right: 16.0, top: 12.0),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
                                     ),
-                                  ),
-                                );
-                              },
-                              child: Card(
-                                color: cardColor,
-                                elevation: 4.0,
-                                margin: EdgeInsets.only(right: 16.0, top: 12.0),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15.0),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: [
-                                          // Profile Image
-                                          logo != null
-                                              ? Container(
-                                                  width: 50.0,
-                                                  height: 50.0,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    image: DecorationImage(
-                                                      image: NetworkImage(logo),
-                                                      fit: BoxFit.cover,
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              // Profile Image
+                                              logo != null
+                                                  ? Container(
+                                                      width: 50.0,
+                                                      height: 50.0,
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        image: DecorationImage(
+                                                          image: NetworkImage(
+                                                              logo),
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : Container(
+                                                      width: 50.0,
+                                                      height: 50.0,
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Colors.grey[300],
+                                                      ),
+                                                      child: Icon(
+                                                        Icons
+                                                            .image_not_supported,
+                                                        size: 30.0,
+                                                        color: Colors.grey[600],
+                                                      ),
                                                     ),
-                                                  ),
-                                                )
-                                              : Container(
-                                                  width: 50.0,
-                                                  height: 50.0,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.grey[300],
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.image_not_supported,
-                                                    size: 30.0,
-                                                    color: Colors.grey[600],
-                                                  ),
+                                              SizedBox(width: 12.0),
+                                              // Job Title & Company
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    if (title.isNotEmpty)
+                                                      Text(
+                                                        title,
+                                                        style: TextStyle(
+                                                          fontSize: 18.0,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: textColor,
+                                                        ),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    if (company.isNotEmpty)
+                                                      Text(
+                                                        company,
+                                                        style: TextStyle(
+                                                          fontSize: 16.0,
+                                                          color: subtitleColor,
+                                                        ),
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                  ],
                                                 ),
-                                          SizedBox(width: 12.0),
-                                          // Job Title & Company
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                if (title.isNotEmpty)
-                                                  Text(
-                                                    title,
+                                              ),
+                                              // Save Icon
+                                              IconButton(
+                                                icon: Icon(
+                                                  savedJobs.any((j) =>
+                                                          j['job_id'] ==
+                                                          job['job_id'])
+                                                      ? Icons
+                                                          .bookmark_added_rounded
+                                                      : Icons
+                                                          .bookmark_add_outlined,
+                                                  size: 30.0,
+                                                  color: savedJobs.any((j) =>
+                                                          j['job_id'] ==
+                                                          job['job_id'])
+                                                      ? Colors.blue
+                                                      : Colors.grey,
+                                                ),
+                                                onPressed: () =>
+                                                    _toggleSave(index),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 12.0),
+                                          Wrap(
+                                            spacing: 8.0,
+                                            runSpacing: 8.0,
+                                            children: [
+                                              if (industry.isNotEmpty)
+                                                _buildTag(
+                                                    industry,
+                                                    tagBackground,
+                                                    tagTextColor),
+                                              if (type.isNotEmpty)
+                                                _buildTag(type, tagBackground,
+                                                    tagTextColor),
+                                              if (position.isNotEmpty)
+                                                _buildTag(
+                                                    position,
+                                                    tagBackground,
+                                                    tagTextColor),
+                                            ],
+                                          ),
+                                          SizedBox(height: 10.0),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              if (currency.isNotEmpty ||
+                                                  salary.isNotEmpty)
+                                                Flexible(
+                                                  flex: 1,
+                                                  child: Text(
+                                                    "$currency $salary",
                                                     style: TextStyle(
-                                                      fontSize: 18.0,
+                                                      fontSize: 16.0,
                                                       fontWeight:
-                                                          FontWeight.bold,
+                                                          FontWeight.w600,
                                                       color: textColor,
                                                     ),
                                                     overflow:
                                                         TextOverflow.ellipsis,
                                                   ),
-                                                if (company.isNotEmpty)
-                                                  Text(
-                                                    company,
-                                                    style: TextStyle(
-                                                      fontSize: 16.0,
-                                                      color: subtitleColor,
-                                                    ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                              ],
-                                            ),
-                                          ),
-                                          // Save Icon
-                                          IconButton(
-                                            icon: Icon(
-                                              savedJobs.any((j) =>
-                                                      j['job_id'] ==
-                                                      job['job_id'])
-                                                  ? Icons.bookmark_added_rounded
-                                                  : Icons.bookmark_add_outlined,
-                                              size: 30.0,
-                                              color: savedJobs.any((j) =>
-                                                      j['job_id'] ==
-                                                      job['job_id'])
-                                                  ? Colors.blue
-                                                  : Colors.grey,
-                                            ),
-                                            onPressed: () => _toggleSave(index),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 12.0),
-                                      Wrap(
-                                        spacing: 8.0,
-                                        runSpacing: 8.0,
-                                        children: [
-                                          if (industry.isNotEmpty)
-                                            _buildTag(industry, tagBackground,
-                                                tagTextColor),
-                                          if (type.isNotEmpty)
-                                            _buildTag(type, tagBackground,
-                                                tagTextColor),
-                                          if (position.isNotEmpty)
-                                            _buildTag(position, tagBackground,
-                                                tagTextColor),
-                                        ],
-                                      ),
-                                      SizedBox(height: 10.0),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          if (currency.isNotEmpty ||
-                                              salary.isNotEmpty)
-                                            Flexible(
-                                              flex: 1,
-                                              child: Text(
-                                                "$currency $salary",
-                                                style: TextStyle(
-                                                  fontSize: 16.0,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: textColor,
                                                 ),
-                                                overflow: TextOverflow.ellipsis,
+                                              Flexible(
+                                                flex: 2,
+                                                child: Row(
+                                                  children: [
+                                                    Icon(Icons.location_on,
+                                                        color: Colors.red,
+                                                        size: 20.0),
+                                                    SizedBox(width: 5.0),
+                                                    Expanded(
+                                                      child: Text(
+                                                        "$city, $state, $country",
+                                                        style: TextStyle(
+                                                          fontSize: 16.0,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: locationColor,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                            ),
-                                          Flexible(
-                                            flex: 2,
-                                            child: Row(
-                                              children: [
-                                                Icon(Icons.location_on,
-                                                    color: Colors.red,
-                                                    size: 20.0),
-                                                SizedBox(width: 5.0),
-                                                Expanded(
-                                                  child: Text(
-                                                    "$city, $state, $country",
-                                                    style: TextStyle(
-                                                      fontSize: 16.0,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: locationColor,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                              );
+                            },
+                          ),
+                        ),
         ],
       ),
     );
