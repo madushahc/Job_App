@@ -1,7 +1,7 @@
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 import 'package:job_app/home_page.dart';
-import 'package:job_app/madusha/settings.dart';
+import 'package:job_app/pages/settings.dart';
 
 class CustomMenubar extends StatelessWidget {
   final bool isDarkMode;

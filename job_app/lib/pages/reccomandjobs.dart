@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:job_app/madusha/jobdetailscreen.dart';
+import 'package:job_app/pages/jobdetailscreen.dart';
 import 'package:amicons/amicons.dart';
-import 'package:job_app/madusha/seeallrecomjobs.dart';
+import 'package:job_app/pages/seeallrecomjobs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class RecomendedJobs extends StatefulWidget {
@@ -85,7 +85,7 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
     final headers = {
       'x-rapidapi-host': 'jsearch.p.rapidapi.com',
       'x-rapidapi-key':
-          '02e57dea4amsh5d35b1f8ef8ac3ap1c0bdbjsn7d6f596d0010', // Replace with actual key
+          '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052', // Replace with actual key
     };
 
     try {

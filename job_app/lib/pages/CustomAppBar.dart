@@ -1,8 +1,8 @@
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 import 'package:job_app/home_page.dart';
-import 'package:job_app/madusha/custommenubar.dart';
-import 'package:job_app/madusha/customnotification.dart';
+import 'package:job_app/pages/CustomMenuBar.dart';
+import 'package:job_app/pages/CustomNotification.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isDarkMode;

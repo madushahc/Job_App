@@ -10,7 +10,7 @@ import 'package:job_app/pages/saved_page.dart';
 import 'package:job_app/themes/app_themes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:job_app/madusha/settings.dart' as Settings;
+import 'package:job_app/pages/settings.dart' as Settings;
 import 'package:job_app/chatbot/chatbot_main.dart'; //amantha
 import 'package:amicons/amicons.dart';
 

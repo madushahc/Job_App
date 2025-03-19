@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:job_app/lakshika/job_search_filters.dart';
-import 'package:job_app/madusha/customcard.dart'; // Import the Customcard screen
+import 'package:job_app/pages/customcard.dart'; // Import the Customcard screen
 
 class SearchScreen extends StatefulWidget {
   final bool isDarkMode;
@@ -158,7 +158,12 @@ class _SearchScreenState extends State<SearchScreen> {
                   onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => FiltersScreen(),
+                      builder: (context) => FiltersScreen(
+                        onApplyFilters: (Map<String, dynamic> filters) {},
+                        jobs: [],
+                        isDarkMode: widget.isDarkMode,
+                        onThemeChanged: () {},
+                      ),
                     ),
                   ),
                   child: Text(

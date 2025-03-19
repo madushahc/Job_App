@@ -1,26 +1,28 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:job_app/madusha/jobdetailscreen.dart';
-import 'package:amicons/amicons.dart';
+import 'package:job_app/pages/jobdetailscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SeeAllRecomendedJobs extends StatefulWidget {
+class Filterpage extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback onThemeChanged;
+  final Map<String, dynamic> filters; // Filters are received here
 
-  const SeeAllRecomendedJobs({
+  const Filterpage({
     super.key,
     required this.isDarkMode,
     required this.onThemeChanged,
+    this.filters = const {}, // Default to an empty map
   });
 
   @override
-  State<SeeAllRecomendedJobs> createState() => _SeeAllRecomendedJobsState();
+  State<Filterpage> createState() => _FilterpageState();
 }
 
-class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
+class _FilterpageState extends State<Filterpage> {
   List<dynamic> jobs = [];
+  List<dynamic> filteredJobs = []; // Stores filtered jobs
   bool isLoading = true;
   String errorMessage = '';
   List<dynamic> savedJobs = [];
@@ -30,6 +32,108 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
     super.initState();
     fetchJobs();
     loadSavedJobs();
+  }
+
+  // Fetch jobs from the API
+  Future<void> fetchJobs() async {
+    print("Fetching job details...");
+
+    // Use the filters to construct the query
+    final String query =
+        widget.filters['companyType'] ?? "software engineer"; // Default query
+    const int numPages = 20; // Number of pages to fetch
+
+    final String url =
+        'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
+    final Uri uri = Uri.parse(url);
+
+    final headers = {
+      'x-rapidapi-host': 'jsearch.p.rapidapi.com',
+      'x-rapidapi-key':
+          '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052', // Replace with your actual API key
+    };
+
+    try {
+      final response = await http.get(uri, headers: headers);
+
+      print("Response Status Code: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        final body = response.body;
+        final json = jsonDecode(body);
+        print("Fetched Data: $json");
+
+        if (json['data'] != null && json['data'].isNotEmpty) {
+          setState(() {
+            jobs = json['data']; // Store all jobs
+            applyFilters(); // Apply filters to the fetched jobs
+            isLoading = false;
+          });
+          print("Jobs list fetched successfully");
+        } else {
+          setState(() {
+            isLoading = false;
+            errorMessage = "No jobs found";
+          });
+        }
+      } else {
+        setState(() {
+          isLoading = false;
+          errorMessage = "Failed to fetch job details: ${response.statusCode}";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        errorMessage = "Error fetching job details: $e";
+      });
+    }
+  }
+
+  void applyFilters() {
+    setState(() {
+      filteredJobs = jobs.where((job) {
+        // Debug logs
+        print("Job: ${job['job_title']}");
+        print(
+            "Company Type: ${job['employer_name']}, Filter: ${widget.filters['companyType']}");
+        print(
+            "Location: ${job['job_city']}, ${job['job_state']}, ${job['job_country']}, Filter: ${widget.filters['location']}");
+        print(
+            "Job Type: ${job['job_employment_type']}, Filter: ${widget.filters['jobTypes']}");
+
+        // Filter by company type
+        final companyTypeMatch = widget.filters['companyType'] == 'Any' ||
+            job['employer_name'] == widget.filters['companyType'];
+
+        // Filter by location
+        final locationMatch = widget.filters['location'] == 'Any' ||
+            (job['job_city'] != null &&
+                job['job_city'] == widget.filters['location']) ||
+            (job['job_state'] != null &&
+                job['job_state'] == widget.filters['location']) ||
+            (job['job_country'] != null &&
+                job['job_country'] == widget.filters['location']);
+
+        // Filter by job type
+        final jobTypeMatch = widget.filters['jobTypes'].isEmpty ||
+            widget.filters['jobTypes'].contains(job['job_employment_type']);
+
+        return companyTypeMatch && locationMatch && jobTypeMatch;
+      }).toList();
+
+      // Debug log to check filtered jobs
+      print("Filtered Jobs: ${filteredJobs.length}");
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant Filterpage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.filters != widget.filters) {
+      applyFilters(); // Re-apply filters when they change
+    }
   }
 
   // Load saved jobs from SharedPreferences
@@ -62,65 +166,11 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
 
   // Toggle save state for a job
   void _toggleSave(int index) async {
-    final job = jobs[index];
+    final job = filteredJobs[index];
     if (savedJobs.any((j) => j['job_id'] == job['job_id'])) {
       await removeJob(job); // Remove job if already saved
     } else {
       await saveJob(job); // Save job if not already saved
-    }
-  }
-
-  Future<void> fetchJobs() async {
-    debugPrint("Fetching job details...");
-
-    const String query =
-        "Software Engineer OR Developer OR QA "; // Combined query
-    const int numPages = 20; // Increase for more jobs
-
-    final String url =
-        'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
-    final Uri uri = Uri.parse(url);
-
-    final headers = {
-      'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-      'x-rapidapi-key':
-          '02e57dea4amsh5d35b1f8ef8ac3ap1c0bdbjsn7d6f596d0010', // Replace with actual key
-    };
-
-    try {
-      final response = await http.get(uri, headers: headers);
-
-      debugPrint("Response Status Code: ${response.statusCode}");
-      debugPrint("Response Body: ${response.body}");
-
-      if (response.statusCode == 200) {
-        final body = response.body;
-        final json = jsonDecode(body);
-        debugPrint("Fetched Data: $json");
-
-        if (json['data'] != null && json['data'].isNotEmpty) {
-          setState(() {
-            jobs = json['data']; // Store multiple jobs
-            isLoading = false;
-          });
-          debugPrint("Jobs list fetched successfully");
-        } else {
-          setState(() {
-            isLoading = false;
-            errorMessage = "No jobs found";
-          });
-        }
-      } else {
-        setState(() {
-          isLoading = false;
-          errorMessage = "Failed to fetch job details: ${response.statusCode}";
-        });
-      }
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-        errorMessage = "Error fetching job details: $e";
-      });
     }
   }
 
@@ -140,7 +190,8 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text("Recommended Jobs")),
+        title: Text("Filter Results"), // Display the search query in the AppBar
+        centerTitle: true, // Center the title
       ),
       body: Column(
         children: [
@@ -158,9 +209,9 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
                         scrollDirection: Axis.vertical,
                         padding: EdgeInsets.only(
                             left: 15.0, right: 15.0, bottom: 15.0),
-                        itemCount: jobs.length,
+                        itemCount: filteredJobs.length,
                         itemBuilder: (context, index) {
-                          final job = jobs[index];
+                          final job = filteredJobs[index];
                           final title = job["job_title"] ?? "";
                           final company = job["employer_name"] ?? "";
                           final logo = job["employer_logo"];
@@ -183,9 +234,8 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
                                   MaterialPageRoute(
                                     builder: (context) => JobDetailsPage(
                                       job: job,
-                                      isSaved: savedJobs.any((j) =>
-                                          j['job_id'] ==
-                                          job['job_id']), // Pass saved state
+                                      isSaved: savedJobs.any(
+                                          (j) => j['job_id'] == job['job_id']),
                                       onSaveChanged: (isSaved) {
                                         if (isSaved) {
                                           saveJob(job); // Save the job
@@ -315,8 +365,7 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
                                           if (currency.isNotEmpty ||
                                               salary.isNotEmpty)
                                             Flexible(
-                                              flex:
-                                                  1, // Adjust flex value as needed
+                                              flex: 1,
                                               child: Text(
                                                 "$currency $salary",
                                                 style: TextStyle(
@@ -328,8 +377,7 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
                                               ),
                                             ),
                                           Flexible(
-                                            flex:
-                                                2, // Give more space to the location
+                                            flex: 2,
                                             child: Row(
                                               children: [
                                                 Icon(Icons.location_on,
@@ -337,7 +385,6 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
                                                     size: 20.0),
                                                 SizedBox(width: 5.0),
                                                 Expanded(
-                                                  // Use Expanded inside the Row to handle text overflow
                                                   child: Text(
                                                     "$city, $state, $country",
                                                     style: TextStyle(

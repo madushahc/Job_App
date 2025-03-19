@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:job_app/madusha/jobdetailscreen.dart';
+import 'package:job_app/pages/jobdetailscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 

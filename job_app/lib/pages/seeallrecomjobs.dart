@@ -1,25 +1,25 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:job_app/madusha/jobdetailscreen.dart';
+import 'package:job_app/pages/jobdetailscreen.dart';
 import 'package:amicons/amicons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SeeAllFeaturedJobs extends StatefulWidget {
+class SeeAllRecomendedJobs extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback onThemeChanged;
 
-  const SeeAllFeaturedJobs({
+  const SeeAllRecomendedJobs({
     super.key,
     required this.isDarkMode,
     required this.onThemeChanged,
   });
 
   @override
-  State<SeeAllFeaturedJobs> createState() => _SeeAllFeaturedJobsState();
+  State<SeeAllRecomendedJobs> createState() => _SeeAllRecomendedJobsState();
 }
 
-class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
+class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
   List<dynamic> jobs = [];
   bool isLoading = true;
   String errorMessage = '';
@@ -71,9 +71,10 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
   }
 
   Future<void> fetchJobs() async {
-    print("Fetching job details...");
+    debugPrint("Fetching job details...");
 
-    const String query = "Jobs"; // Combined query
+    const String query =
+        "Software Engineer OR Developer OR QA "; // Combined query
     const int numPages = 20; // Increase for more jobs
 
     final String url =
@@ -83,26 +84,26 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
     final headers = {
       'x-rapidapi-host': 'jsearch.p.rapidapi.com',
       'x-rapidapi-key':
-          '02e57dea4amsh5d35b1f8ef8ac3ap1c0bdbjsn7d6f596d0010', // Replace with actual key
+          '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052', // Replace with actual key
     };
 
     try {
       final response = await http.get(uri, headers: headers);
 
-      print("Response Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
+      debugPrint("Response Status Code: ${response.statusCode}");
+      debugPrint("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
         final body = response.body;
         final json = jsonDecode(body);
-        print("Fetched Data: $json");
+        debugPrint("Fetched Data: $json");
 
         if (json['data'] != null && json['data'].isNotEmpty) {
           setState(() {
             jobs = json['data']; // Store multiple jobs
             isLoading = false;
           });
-          print("Jobs list fetched successfully");
+          debugPrint("Jobs list fetched successfully");
         } else {
           setState(() {
             isLoading = false;
@@ -139,7 +140,7 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text("Featured Jobs")),
+        title: Center(child: Text("Recommended Jobs")),
       ),
       body: Column(
         children: [
@@ -291,9 +292,9 @@ class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
                                         ],
                                       ),
                                       SizedBox(height: 12.0),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
+                                      Wrap(
+                                        spacing: 8.0,
+                                        runSpacing: 8.0,
                                         children: [
                                           if (industry.isNotEmpty)
                                             _buildTag(industry, tagBackground,
