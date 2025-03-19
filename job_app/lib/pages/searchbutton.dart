@@ -14,9 +14,7 @@ class SearchButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     final buttonColor = isDarkMode ? Colors.grey[900] : Colors.white;
-
     final borderColor = isDarkMode ? Colors.white : Colors.black;
     final iconColor = isDarkMode ? Colors.white : Colors.black;
     final textColor = isDarkMode ? Colors.white70 : Colors.black54;
@@ -24,15 +22,14 @@ class SearchButton extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 10.0, right: 10.0, left: 10.0),
       child: SizedBox(
-        width: 370, // Button width
+        width: 370,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: buttonColor, // Background adapts to theme
-            padding: const EdgeInsets.symmetric(vertical: 14), // Padding
+            backgroundColor: buttonColor,
+            padding: const EdgeInsets.symmetric(vertical: 14),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(100.0), // Rounded corners
-              side: BorderSide(
-                  color: borderColor, width: 2), // Border color adapts
+              borderRadius: BorderRadius.circular(100.0),
+              side: BorderSide(color: borderColor, width: 2),
             ),
           ),
           onPressed: () => Navigator.push(
@@ -45,21 +42,20 @@ class SearchButton extends StatelessWidget {
             ),
           ),
           child: Row(
-            // Prevents unnecessary stretching
             children: [
               Padding(
                 padding: EdgeInsets.only(left: 20.0),
               ),
               Icon(
                 Icons.search,
-                color: iconColor, // Icon color adapts to theme
+                color: iconColor,
                 size: 30.0,
               ),
-              const SizedBox(width: 10), // Space between icon and text
+              const SizedBox(width: 10),
               Text(
                 "  Search here...",
                 style: TextStyle(
-                  color: textColor, // Text color adapts to theme
+                  color: textColor,
                   fontSize: 20,
                 ),
                 textAlign: TextAlign.start,

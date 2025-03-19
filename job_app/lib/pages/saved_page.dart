@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:job_app/madusha/jobdetailscreen.dart';
+import 'package:job_app/pages/jobdetailscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
@@ -71,7 +71,6 @@ class _SavedPageState extends State<SavedPage> {
           final Color subtitleColor =
               isDarkMode ? Colors.grey[400]! : Colors.grey[700]!;
           final Color cardColor = isDarkMode ? Colors.grey[800]! : Colors.white;
-          final Color iconColor = isDarkMode ? Colors.white : Colors.blueAccent;
           final Color tagBackground =
               isDarkMode ? Colors.blueGrey[800]! : Colors.blue[50]!;
           final Color tagTextColor =
@@ -97,9 +96,7 @@ class _SavedPageState extends State<SavedPage> {
               Padding(
                 padding: EdgeInsets.all(15.0),
                 child: SizedBox(
-                  width: MediaQuery.of(context)
-                      .size
-                      .width, // Set a bounded width for each item
+                  width: MediaQuery.of(context).size.width,
                   child: GestureDetector(
                     onTap: () {
                       Navigator.push(
@@ -107,16 +104,15 @@ class _SavedPageState extends State<SavedPage> {
                         MaterialPageRoute(
                           builder: (context) => JobDetailsPage(
                             job: job,
-                            isSaved: savedJobs.any((j) =>
-                                j['job_id'] ==
-                                job['job_id']), // Pass saved state
+                            isSaved: savedJobs
+                                .any((j) => j['job_id'] == job['job_id']),
                             onSaveChanged: (isSaved) {
                               if (isSaved) {
-                                saveJob(job); // Save the job
+                                saveJob(job);
                               } else {
-                                removeJob(job); // Remove the job
+                                removeJob(job);
                               }
-                              loadSavedJobs(); // Reload the saved jobs list
+                              loadSavedJobs();
                             },
                           ),
                         ),
@@ -136,7 +132,6 @@ class _SavedPageState extends State<SavedPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                // Profile Image
                                 logo != null
                                     ? Container(
                                         width: 50.0,
@@ -163,7 +158,6 @@ class _SavedPageState extends State<SavedPage> {
                                         ),
                                       ),
                                 SizedBox(width: 12.0),
-                                // Job Title & Company
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -217,7 +211,7 @@ class _SavedPageState extends State<SavedPage> {
                               children: [
                                 if (currency.isNotEmpty || salary.isNotEmpty)
                                   Flexible(
-                                    flex: 1, // Adjust flex value as needed
+                                    flex: 1,
                                     child: Text(
                                       "$currency $salary",
                                       style: TextStyle(
@@ -229,14 +223,13 @@ class _SavedPageState extends State<SavedPage> {
                                     ),
                                   ),
                                 Flexible(
-                                  flex: 2, // Give more space to the location
+                                  flex: 2,
                                   child: Row(
                                     children: [
                                       Icon(Icons.location_on,
                                           color: Colors.red, size: 20.0),
                                       SizedBox(width: 5.0),
                                       Expanded(
-                                        // Use Expanded inside the Row to handle text overflow
                                         child: Text(
                                           "$city, $state, $country",
                                           style: TextStyle(

@@ -1,26 +1,24 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:job_app/madusha/jobdetailscreen.dart';
-import 'package:amicons/amicons.dart';
-import 'package:job_app/madusha/seeallrecomjobs.dart';
+import 'package:job_app/pages/jobdetailscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class RecomendedJobs extends StatefulWidget {
+class SeeAllFeaturedJobs extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback onThemeChanged;
 
-  const RecomendedJobs({
+  const SeeAllFeaturedJobs({
     super.key,
     required this.isDarkMode,
     required this.onThemeChanged,
   });
 
   @override
-  State<RecomendedJobs> createState() => _RecomendedJobsState();
+  State<SeeAllFeaturedJobs> createState() => _SeeAllFeaturedJobsState();
 }
 
-class _RecomendedJobsState extends State<RecomendedJobs> {
+class _SeeAllFeaturedJobsState extends State<SeeAllFeaturedJobs> {
   List<dynamic> jobs = [];
   bool isLoading = true;
   String errorMessage = '';
@@ -33,7 +31,6 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
     loadSavedJobs();
   }
 
-  // Load saved jobs from SharedPreferences
   Future<void> loadSavedJobs() async {
     final prefs = await SharedPreferences.getInstance();
     final savedJobsJson = prefs.getStringList('savedJobs') ?? [];
@@ -42,7 +39,6 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
     });
   }
 
-  // Save a job to SharedPreferences
   Future<void> saveJob(Map<String, dynamic> job) async {
     final prefs = await SharedPreferences.getInstance();
     final jobJson = jsonEncode(job);
@@ -52,7 +48,6 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
     setState(() {});
   }
 
-  // Remove a job from SharedPreferences
   Future<void> removeJob(Map<String, dynamic> job) async {
     final prefs = await SharedPreferences.getInstance();
     savedJobs.removeWhere((j) => j['job_id'] == job['job_id']);
@@ -61,50 +56,38 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
     setState(() {});
   }
 
-  // Toggle save state for a job
   void _toggleSave(int index) async {
     final job = jobs[index];
     if (savedJobs.any((j) => j['job_id'] == job['job_id'])) {
-      await removeJob(job); // Remove job if already saved
+      await removeJob(job);
     } else {
-      await saveJob(job); // Save job if not already saved
+      await saveJob(job);
     }
   }
 
   Future<void> fetchJobs() async {
-    print("Fetching job details...");
-
-    const String query =
-        "Software Engineer OR Developer OR QA  "; // Combined query
-    const int numPages = 1; // Increase for more jobs
-
+    const String query = "Jobs";
+    const int numPages = 20;
     final String url =
         'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
     final Uri uri = Uri.parse(url);
-
     final headers = {
       'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-      'x-rapidapi-key':
-          '02e57dea4amsh5d35b1f8ef8ac3ap1c0bdbjsn7d6f596d0010', // Replace with actual key
+      'x-rapidapi-key': '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052',
     };
 
     try {
       final response = await http.get(uri, headers: headers);
 
-      print("Response Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
-
       if (response.statusCode == 200) {
         final body = response.body;
         final json = jsonDecode(body);
-        print("Fetched Data: $json");
 
         if (json['data'] != null && json['data'].isNotEmpty) {
           setState(() {
-            jobs = json['data']; // Store multiple jobs
+            jobs = json['data'];
             isLoading = false;
           });
-          print("Jobs list fetched successfully");
         } else {
           setState(() {
             isLoading = false;
@@ -132,79 +115,50 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
     final Color subtitleColor =
         isDarkMode ? Colors.grey[400]! : Colors.grey[700]!;
     final Color cardColor = isDarkMode ? Colors.grey[800]! : Colors.white;
-    final Color iconColor = isDarkMode ? Colors.white : Colors.blueAccent;
     final Color tagBackground =
         isDarkMode ? Colors.blueGrey[800]! : Colors.blue[50]!;
     final Color tagTextColor =
         isDarkMode ? Colors.blueAccent : Colors.blueAccent;
     final Color locationColor = isDarkMode ? Colors.white70 : Colors.black87;
 
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Recommended Jobs",
-                style: TextStyle(
-                    color: textColor,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold),
-              ),
-              GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SeeAllRecomendedJobs(
-                        isDarkMode: isDarkMode,
-                        onThemeChanged: widget.onThemeChanged),
-                  ),
-                ),
-                child: Text(
-                  "see all",
-                  style: TextStyle(color: Colors.lightBlue, fontSize: 16.0),
-                ),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 10.0), // Reduced extra spacing
-        isLoading
-            ? const Center(
-                child: CircularProgressIndicator(),
-              ) // Show loading indicator while fetching
-            : errorMessage.isNotEmpty
-                ? Center(
-                    child: Text(errorMessage),
-                  ) // Show error message if fetch failed
-                : SizedBox(
-                    height: 200, // Set a fixed height for the horizontal list
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: EdgeInsets.only(left: 15.0, bottom: 15.0),
-                      itemCount: jobs.length,
-                      itemBuilder: (context, index) {
-                        final job = jobs[index];
-                        final title = job["job_title"] ?? "";
-                        final company = job["employer_name"] ?? "";
-                        final logo = job["employer_logo"];
-                        final city = job["job_city"] ?? "";
-                        final state = job["job_state"] ?? "";
-                        final country = job["job_country"] ?? "";
-                        final currency = job["job_salary_currency"] ?? "";
-                        final salary = job["job_min_salary"]?.toString() ?? "";
-                        final position = job["job_job_title"] ?? "";
-                        final industry = job["employer_company_type"] ?? "";
-                        final type = job["job_employment_type"] ?? "";
+    return Scaffold(
+      appBar: AppBar(
+        title: Center(child: Text("Featured Jobs")),
+      ),
+      body: Column(
+        children: [
+          SizedBox(height: 10.0),
+          isLoading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : errorMessage.isNotEmpty
+                  ? Center(
+                      child: Text(errorMessage),
+                    )
+                  : Expanded(
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        padding: EdgeInsets.only(
+                            left: 15.0, right: 15.0, bottom: 15.0),
+                        itemCount: jobs.length,
+                        itemBuilder: (context, index) {
+                          final job = jobs[index];
+                          final title = job["job_title"] ?? "";
+                          final company = job["employer_name"] ?? "";
+                          final logo = job["employer_logo"];
+                          final city = job["job_city"] ?? "";
+                          final state = job["job_state"] ?? "";
+                          final country = job["job_country"] ?? "";
+                          final currency = job["job_salary_currency"] ?? "";
+                          final salary =
+                              job["job_min_salary"]?.toString() ?? "";
+                          final position = job["job_job_title"] ?? "";
+                          final industry = job["employer_company_type"] ?? "";
+                          final type = job["job_employment_type"] ?? "";
 
-                        return Padding(
-                          padding: EdgeInsets.only(right: 15.0),
-                          child: SizedBox(
-                            width: MediaQuery.of(context)
-                                .size
-                                .width, // Set a bounded width for each item
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: 15.0),
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -212,14 +166,13 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
                                   MaterialPageRoute(
                                     builder: (context) => JobDetailsPage(
                                       job: job,
-                                      isSaved: savedJobs.any((j) =>
-                                          j['job_id'] ==
-                                          job['job_id']), // Pass saved state
+                                      isSaved: savedJobs.any(
+                                          (j) => j['job_id'] == job['job_id']),
                                       onSaveChanged: (isSaved) {
                                         if (isSaved) {
-                                          saveJob(job); // Save the job
+                                          saveJob(job);
                                         } else {
-                                          removeJob(job); // Remove the job
+                                          removeJob(job);
                                         }
                                       },
                                     ),
@@ -229,10 +182,7 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
                               child: Card(
                                 color: cardColor,
                                 elevation: 4.0,
-                                margin: EdgeInsets.only(
-                                  right: 16.0,
-                                  top: 12.0,
-                                ),
+                                margin: EdgeInsets.only(right: 16.0, top: 12.0),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15.0),
                                 ),
@@ -246,7 +196,6 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          // Profile Image
                                           logo != null
                                               ? Container(
                                                   width: 50.0,
@@ -273,7 +222,6 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
                                                   ),
                                                 ),
                                           SizedBox(width: 12.0),
-                                          // Job Title & Company
                                           Expanded(
                                             child: Column(
                                               crossAxisAlignment:
@@ -304,27 +252,21 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
                                               ],
                                             ),
                                           ),
-                                          // Save Icon
                                           IconButton(
                                             icon: Icon(
                                               savedJobs.any((j) =>
                                                       j['job_id'] ==
                                                       job['job_id'])
-                                                  ? Icons
-                                                      .bookmark_added_rounded // Icon when job is saved
-                                                  : Icons
-                                                      .bookmark_add_outlined, // Icon when job is not saved
-                                              size: 35,
+                                                  ? Icons.bookmark_added_rounded
+                                                  : Icons.bookmark_add_outlined,
+                                              size: 30.0,
                                               color: savedJobs.any((j) =>
                                                       j['job_id'] ==
                                                       job['job_id'])
-                                                  ? Colors
-                                                      .blue // Color when job is saved
-                                                  : Colors
-                                                      .grey, // Color when job is not saved
+                                                  ? Colors.blue
+                                                  : Colors.grey,
                                             ),
-                                            onPressed: () => _toggleSave(
-                                                index), // Toggle save state
+                                            onPressed: () => _toggleSave(index),
                                           ),
                                         ],
                                       ),
@@ -352,8 +294,7 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
                                           if (currency.isNotEmpty ||
                                               salary.isNotEmpty)
                                             Flexible(
-                                              flex:
-                                                  1, // Adjust flex value as needed
+                                              flex: 1,
                                               child: Text(
                                                 "$currency $salary",
                                                 style: TextStyle(
@@ -365,8 +306,7 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
                                               ),
                                             ),
                                           Flexible(
-                                            flex:
-                                                2, // Give more space to the location
+                                            flex: 2,
                                             child: Row(
                                               children: [
                                                 Icon(Icons.location_on,
@@ -374,7 +314,6 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
                                                     size: 20.0),
                                                 SizedBox(width: 5.0),
                                                 Expanded(
-                                                  // Use Expanded inside the Row to handle text overflow
                                                   child: Text(
                                                     "$city, $state, $country",
                                                     style: TextStyle(
@@ -397,12 +336,12 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
-                  ),
-      ],
+        ],
+      ),
     );
   }
 

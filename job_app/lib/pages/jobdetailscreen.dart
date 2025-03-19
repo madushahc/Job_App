@@ -3,13 +3,13 @@ import 'package:url_launcher/url_launcher.dart';
 
 class JobDetailsPage extends StatefulWidget {
   final Map<String, dynamic> job;
-  final bool isSaved; // Add this
+  final bool isSaved;
   final Function(bool) onSaveChanged;
-  // Add this
+
   const JobDetailsPage({
     super.key,
     required this.job,
-    required this.isSaved, // Add this
+    required this.isSaved,
     required this.onSaveChanged,
   });
 
@@ -18,28 +18,24 @@ class JobDetailsPage extends StatefulWidget {
 }
 
 class _JobDetailsPageState extends State<JobDetailsPage> {
-  int _selectedTab = 0; // To keep track of the selected tab
-  bool _isBookmarked = false; // To track bookmark state
+  int _selectedTab = 0;
+  bool _isBookmarked = false;
 
   @override
   void initState() {
     super.initState();
-    _isBookmarked = widget.isSaved; // Initialize with the passed value
+    _isBookmarked = widget.isSaved;
   }
 
-  // Helper function to remove HTML tags from a string
   String _removeHtmlTags(String html) {
-    // Use regex to remove HTML tags
     return html.replaceAll(RegExp(r'<[^>]*>'), '');
   }
 
-  // Helper function to split description into lines and add bullet points
   List<String> _parseDescription(String description) {
     final List<String> lines = description.split('\n');
     return lines.where((line) => line.trim().isNotEmpty).toList();
   }
 
-  // Method to show a dialog for selecting an apply option
   Future<void> _showApplyOptionsDialog(
       BuildContext context, bool isDarkMode) async {
     final applyOptions = widget.job["apply_options"] ?? [];
@@ -72,17 +68,15 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                   title: Text(publisher),
                   onTap: () async {
                     final Uri url = Uri.parse(Uri.decodeFull(applyLink));
-                    print("Trying to launch URL: $url"); // Debugging
+
                     if (await canLaunch(url.toString())) {
-                      print("URL can be launched"); // Debugging
                       await launch(url.toString());
                     } else {
-                      print("URL cannot be launched"); // Debugging
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Could not launch the URL.')),
                       );
                     }
-                    Navigator.pop(context); // Close the dialog
+                    Navigator.pop(context);
                   },
                 );
               }).toList(),
@@ -113,13 +107,9 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
     final requirements = widget.job["job_highlights"]?["Qualifications"] ?? [];
     final responsibilities =
         widget.job["job_highlights"]?["Responsibilities"] ?? [];
-
-    // Parse description into lines
     final descriptionLines = _parseDescription(description);
 
-    // Content for each tab
     final List<Widget> _tabsContent = [
-      // Description Tab
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -146,8 +136,6 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
           }).toList(),
         ],
       ),
-
-      // Requirements Tab (Qualifications and Responsibilities)
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -200,8 +188,6 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
           ],
         ],
       ),
-
-      // About Tab (Additional Information)
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -399,7 +385,6 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Top Section with Gradient Background
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -418,7 +403,6 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                 ),
                 child: Column(
                   children: [
-                    // Back Button & Save Icon
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -433,8 +417,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                           onPressed: () {
                             setState(() {
                               _isBookmarked = !_isBookmarked;
-                              widget.onSaveChanged(
-                                  _isBookmarked); // Notify the parent
+                              widget.onSaveChanged(_isBookmarked);
                             });
                           },
                           icon: Icon(
@@ -449,7 +432,6 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                     ),
                     const SizedBox(height: 15),
 
-                    // Company Logo
                     CircleAvatar(
                       backgroundImage: logo != null
                           ? NetworkImage(logo)
@@ -458,7 +440,6 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                     ),
                     const SizedBox(height: 10),
 
-                    // Job Title & Company
                     Center(
                       child: Text(
                         title,
@@ -509,9 +490,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 20),
-
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -523,10 +502,7 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // Display the content of the selected tab
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: _tabsContent[_selectedTab],
@@ -582,10 +558,10 @@ class _JobDetailsPageState extends State<JobDetailsPage> {
           text,
           style: TextStyle(
             color: _selectedTab == index
-                ? Colors.white // Selected tab text color (always white)
+                ? Colors.white
                 : Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white // Dark mode text color for unselected tabs
-                    : Colors.black, // Light mode text color for unselected tabs
+                    ? Colors.white
+                    : Colors.black,
             fontWeight: FontWeight.bold,
           ),
         ),

@@ -19,7 +19,7 @@ class CustomNotification extends StatelessWidget {
           children: [
             IconButton(
               onPressed: () {
-                Navigator.pop(context); // Closes the current page
+                Navigator.pop(context);
               },
               icon: Icon(Icons.close),
               iconSize: 30.0,

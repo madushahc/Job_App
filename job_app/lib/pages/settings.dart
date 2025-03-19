@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:job_app/madusha/customnotification.dart';
+import 'package:job_app/pages/CustomNotification.dart';
 
 /// The [AppTheme] defines light and dark themes for the app.
 abstract final class AppTheme {
