@@ -1,7 +1,8 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:job_app/home_page.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:job_app/lakshika/comseeall.dart';
 
 class PopularCompanies extends StatefulWidget {
   final bool isDarkMode;
@@ -17,86 +18,76 @@ class PopularCompanies extends StatefulWidget {
   State<PopularCompanies> createState() => _PopularCompaniesState();
 }
 
-List<dynamic> jobs = [];
-bool isLoading = true;
-String errorMessage = '';
+class _PopularCompaniesState extends State<PopularCompanies> {
+  List<dynamic> jobs = [];
+  bool isLoading = true;
+  String errorMessage = '';
 
-@override
-void initState() {
-  super.initState();
-  fetchJobs();
-}
+  @override
+  void initState() {
+    super.initState();
+    fetchJobs();
+  }
 
-Future<void> fetchJobs() async {
-  print("Fetching job details...");
+  Future<void> fetchJobs() async {
+    const String query = "jobs";
+    const int numPages = 1;
 
-  const String query = "jobs"; // General query for all job types
-  const int numPages = 1; // Increase for more jobs
+    final String url =
+        'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
+    final Uri uri = Uri.parse(url);
 
-  final String url =
-      'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
-  final Uri uri = Uri.parse(url);
+    final headers = {
+      'x-rapidapi-host': 'jsearch.p.rapidapi.com',
+      'x-rapidapi-key':
+          'b82235208amsh8a43112a2c5c8e4p19ceb3jsn0ceb21592560', // Replace with actual key
+    };
 
-  final headers = {
-    'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-    'x-rapidapi-key':
-        'b82235208amsh8a43112a2c5c8e4p19ceb3jsn0ceb21592560', // Replace with actual key
-  };
+    try {
+      final response = await http.get(uri, headers: headers);
 
-  try {
-    final response = await http.get(uri, headers: headers);
-
-    print("Response Status Code: ${response.statusCode}");
-    print("Response Body: ${response.body}");
-
-    if (response.statusCode == 200) {
-      final body = response.body;
-      final json = jsonDecode(body);
-      print("Fetched Data: $json");
-
-      if (json['data'] != null && json['data'].isNotEmpty) {
-        setState(() {
-          jobs = json['data']; // Store multiple jobs
-          isLoading = false;
-        });
-        print("Jobs list fetched successfully");
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        if (json['data'] != null && json['data'].isNotEmpty) {
+          setState(() {
+            jobs = json['data'];
+            isLoading = false;
+          });
+        } else {
+          setState(() {
+            isLoading = false;
+            errorMessage = "No jobs found";
+          });
+        }
       } else {
         setState(() {
           isLoading = false;
-          errorMessage = "No jobs found";
+          errorMessage = "Failed to fetch job details: ${response.statusCode}";
         });
       }
-    } else {
+    } catch (e) {
       setState(() {
         isLoading = false;
-        errorMessage = "Failed to fetch job details: ${response.statusCode}";
+        errorMessage = "Error fetching job details: $e";
       });
     }
-  } catch (e) {
-    setState(() {
-      isLoading = false;
-      errorMessage = "Error fetching job details: $e";
-    });
   }
-}
-
-class _PopularCompaniesState extends State<PopularCompanies> {
-  // Dummy data for companies
-  final List<Map<String, String>> companies = [
-    {"name": "Microsoft", "logo": "assets/microsoft.png"},
-    {"name": "Google", "logo": "assets/google.png"},
-    {"name": "Amazon", "logo": "assets/amazon.png"},
-    {"name": "Tesla", "logo": "assets/tesla.png"},
-  ];
 
   @override
   Widget build(BuildContext context) {
     final Color textColor = widget.isDarkMode ? Colors.white : Colors.black87;
 
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (errorMessage.isNotEmpty) {
+      return Center(child: Text(errorMessage));
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section title with "See All"
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Row(
@@ -107,7 +98,7 @@ class _PopularCompaniesState extends State<PopularCompanies> {
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
-                  color: textColor, // Dark mode support
+                  color: textColor,
                 ),
               ),
               Material(
@@ -115,7 +106,10 @@ class _PopularCompaniesState extends State<PopularCompanies> {
                 child: InkWell(
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => HomePage1()),
+                    MaterialPageRoute(
+                        builder: (context) => CompanySeeAll(
+                            isDarkMode: widget.isDarkMode,
+                            onThemeChanged: widget.onThemeChanged)),
                   ),
                   borderRadius: BorderRadius.circular(4.0),
                   child: const Padding(
@@ -131,20 +125,24 @@ class _PopularCompaniesState extends State<PopularCompanies> {
             ],
           ),
         ),
-
         const SizedBox(height: 10.0),
-
-        // Horizontal list of companies
         SizedBox(
-          height: 110.0, // Ensure proper alignment
+          height: 150.0, // Increased height for better visibility
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.only(left: 16.0),
-            itemCount: companies.length,
+            padding: const EdgeInsets.only(left: 15.0, bottom: 15.0),
+            itemCount: jobs.length,
             itemBuilder: (context, index) {
-              return _buildCompanyCard(
-                companies[index]["name"]!,
-                companies[index]["logo"]!,
+              final job = jobs[index];
+              final company = job["employer_name"] ?? "";
+              final logo = job["employer_logo"]?.isNotEmpty == true
+                  ? job["employer_logo"]
+                  : 'assets/non.jpg'; // Fallback to local asset
+
+              return CompanyCard(
+                companyName: company,
+                logoUrl: logo,
+                isDarkMode: widget.isDarkMode,
               );
             },
           ),
@@ -152,45 +150,66 @@ class _PopularCompaniesState extends State<PopularCompanies> {
       ],
     );
   }
+}
 
-  // Company Card Widget with Dark Mode support
-  Widget _buildCompanyCard(String name, String logoPath) {
-    return Container(
-      margin: const EdgeInsets.only(right: 15.0),
-      width: 90.0, // Fixed width for each item
-      child: Column(
-        children: [
-          Container(
-            width: 60.0,
-            height: 60.0,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: AssetImage(logoPath),
+class CompanyCard extends StatelessWidget {
+  final String companyName;
+  final String logoUrl;
+  final bool isDarkMode;
+
+  const CompanyCard({
+    super.key,
+    required this.companyName,
+    required this.logoUrl,
+    required this.isDarkMode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: Container(
+        margin: const EdgeInsets.all(8.0),
+        width: 100.0,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: FadeInImage(
+                placeholder: AssetImage('assets/non.jpg'), // Fallback image
+                image: logoUrl.startsWith('http')
+                    ? NetworkImage(logoUrl)
+                    : AssetImage(logoUrl) as ImageProvider,
                 fit: BoxFit.cover,
+                width: 80.0,
+                height: 80.0,
+                imageErrorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/non.jpg', // Fallback image
+                    fit: BoxFit.cover,
+                    width: 80.0,
+                    height: 80.0,
+                  );
+                },
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: widget.isDarkMode
-                      ? Colors.white24 // Softer shadow in dark mode
-                      : Colors.grey.withOpacity(0.3),
-                  blurRadius: 5.0,
-                  spreadRadius: 2.0,
-                ),
-              ],
             ),
-          ),
-          const SizedBox(height: 6.0),
-          Text(
-            name,
-            style: TextStyle(
-              fontSize: 14.0,
-              fontWeight: FontWeight.bold,
-              color: widget.isDarkMode ? Colors.white : Colors.black87,
+            const SizedBox(height: 8.0),
+            Text(
+              companyName,
+              style: TextStyle(
+                fontSize: 14.0,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black87,
+              ),
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
