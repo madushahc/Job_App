@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:job_app/chatbot/home_page.dart';
+import 'package:job_app/lakshika/CompanyDetailPage.dart';
 
 class CompanySeeAll extends StatefulWidget {
   final bool isDarkMode;
@@ -30,8 +30,8 @@ class _CompanySeeAllState extends State<CompanySeeAll> {
   Future<void> fetchJobs() async {
     debugPrint("Fetching job details...");
 
-    const String query = "Jobs"; // Combined query
-    const int numPages = 20; // Increase for more jobs
+    const String query = "Jobs";
+    const int numPages = 20;
 
     final String url =
         'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
@@ -39,27 +39,21 @@ class _CompanySeeAllState extends State<CompanySeeAll> {
 
     final headers = {
       'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-      'x-rapidapi-key':
-          'b82235208amsh8a43112a2c5c8e4p19ceb3jsn0ceb21592560', // Replace with actual key
+      'x-rapidapi-key': 'b82235208amsh8a43112a2c5c8e4p19ceb3jsn0ceb21592560',
     };
 
     try {
       final response = await http.get(uri, headers: headers);
-
       debugPrint("Response Status Code: ${response.statusCode}");
-      debugPrint("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
-        final body = response.body;
-        final json = jsonDecode(body);
-        debugPrint("Fetched Data: $json");
+        final json = jsonDecode(response.body);
 
         if (json['data'] != null && json['data'].isNotEmpty) {
           setState(() {
-            jobs = json['data']; // Store multiple jobs
+            jobs = json['data'];
             isLoading = false;
           });
-          debugPrint("Jobs list fetched successfully");
         } else {
           setState(() {
             isLoading = false;
@@ -87,28 +81,27 @@ class _CompanySeeAllState extends State<CompanySeeAll> {
     final Color subtitleColor =
         isDarkMode ? Colors.grey[400]! : Colors.grey[700]!;
     final Color cardColor = isDarkMode ? Colors.grey[800]! : Colors.white;
-    final Color iconColor = isDarkMode ? Colors.white : Colors.blueAccent;
     final Color tagBackground =
         isDarkMode ? Colors.blueGrey[800]! : Colors.blue[50]!;
-    final Color tagTextColor =
-        isDarkMode ? Colors.blueAccent : Colors.blueAccent;
+    final Color tagTextColor = Colors.blueAccent;
     final Color locationColor = isDarkMode ? Colors.white70 : Colors.black87;
 
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text("Company")),
+        title: Center(
+          child: Text(
+            "Company",
+            style: TextStyle(color: textColor, fontSize: 20.0),
+          ),
+        ),
       ),
       body: Column(
         children: [
-          SizedBox(height: 10.0), // Reduced extra spacing
+          SizedBox(height: 10.0),
           isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                ) // Show loading indicator while fetching
+              ? const Center(child: CircularProgressIndicator())
               : errorMessage.isNotEmpty
-                  ? Center(
-                      child: Text(errorMessage),
-                    ) // Show error message if fetch failed
+                  ? Center(child: Text(errorMessage))
                   : Expanded(
                       child: ListView.builder(
                         scrollDirection: Axis.vertical,
@@ -122,7 +115,6 @@ class _CompanySeeAllState extends State<CompanySeeAll> {
                           final country = job["job_country"] ?? "";
                           final company = job["employer_name"] ?? "";
                           final logo = job["employer_logo"];
-
                           final industry = job["employer_company_type"] ?? "";
 
                           return Padding(
@@ -132,7 +124,9 @@ class _CompanySeeAllState extends State<CompanySeeAll> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => HomePage()),
+                                    builder: (context) =>
+                                        CompanyDetailPage(companyName: company),
+                                  ),
                                 );
                               },
                               child: Card(
@@ -152,30 +146,57 @@ class _CompanySeeAllState extends State<CompanySeeAll> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          // Profile Image
+                                          // Clickable logo
                                           logo != null
-                                              ? Container(
-                                                  width: 50.0,
-                                                  height: 50.0,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    image: DecorationImage(
-                                                      image: NetworkImage(logo),
-                                                      fit: BoxFit.cover,
+                                              ? GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            CompanyDetailPage(
+                                                                companyName:
+                                                                    company),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Container(
+                                                    width: 50.0,
+                                                    height: 50.0,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      image: DecorationImage(
+                                                        image:
+                                                            NetworkImage(logo),
+                                                        fit: BoxFit.cover,
+                                                      ),
                                                     ),
                                                   ),
                                                 )
-                                              : Container(
-                                                  width: 50.0,
-                                                  height: 50.0,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.grey[300],
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.image_not_supported,
-                                                    size: 30.0,
-                                                    color: Colors.grey[600],
+                                              : GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            CompanyDetailPage(
+                                                                companyName:
+                                                                    company),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Container(
+                                                    width: 50.0,
+                                                    height: 50.0,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color: Colors.grey[300],
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.image_not_supported,
+                                                      size: 30.0,
+                                                      color: Colors.grey[600],
+                                                    ),
                                                   ),
                                                 ),
                                           SizedBox(width: 12.0),
@@ -198,7 +219,6 @@ class _CompanySeeAllState extends State<CompanySeeAll> {
                                               ],
                                             ),
                                           ),
-                                          // Save Icon
                                         ],
                                       ),
                                       SizedBox(height: 12.0),
@@ -217,8 +237,7 @@ class _CompanySeeAllState extends State<CompanySeeAll> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Flexible(
-                                            flex:
-                                                2, // Give more space to the location
+                                            flex: 2,
                                             child: Row(
                                               children: [
                                                 Icon(Icons.location_on,
@@ -226,7 +245,6 @@ class _CompanySeeAllState extends State<CompanySeeAll> {
                                                     size: 20.0),
                                                 SizedBox(width: 5.0),
                                                 Expanded(
-                                                  // Use Expanded inside the Row to handle text overflow
                                                   child: Text(
                                                     "$city, $state, $country",
                                                     style: TextStyle(
