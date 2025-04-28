@@ -1,4 +1,6 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'firebase_options.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:job_app/components/add_post.dart';
 import 'package:job_app/pages/explore_page.dart';
@@ -8,11 +10,17 @@ import 'package:job_app/pages/saved_page.dart';
 import 'package:job_app/themes/app_themes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:job_app/madusha/settings.dart' as Settings;
+import 'package:job_app/pages/settings.dart' as Settings;
 import 'package:job_app/chatbot/chatbot_main.dart'; //amantha
 import 'package:amicons/amicons.dart';
 
-void main() => runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const MyApp());
+}
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -51,7 +59,10 @@ class _MyAppState extends State<MyApp> {
         isDarkMode: isDarkMode,
         onThemeChanged: () => toggleTheme(!isDarkMode),
       ),
-      SavedPage(),
+      SavedPage(
+        isDarkMode: isDarkMode,
+        onThemeChanged: () => toggleTheme(!isDarkMode),
+      ),
       ProfilePage(),
       Settings.Settings(
         isDarkMode: isDarkMode,
@@ -184,7 +195,6 @@ class HomeScreen extends StatelessWidget {
                 if (currentIndex == 1)
                   FloatingActionButton(
                     onPressed: () {
-
                       print("UPSEES BOT is Working ");
 
                       Navigator.push(
@@ -196,7 +206,6 @@ class HomeScreen extends StatelessWidget {
                           ),
                         ),
                       );
-
                     },
                     backgroundColor:
                         isDarkMode ? Colors.blue[900] : Colors.blue[200],

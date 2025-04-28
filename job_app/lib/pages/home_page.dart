@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:job_app/madusha/carousel.dart';
-import 'package:job_app/madusha/companies.dart';
-import 'package:job_app/madusha/customappbar.dart';
-import 'package:job_app/madusha/featured_jobs.dart';
-import 'package:job_app/madusha/reccomandjobs.dart';
-import 'package:job_app/madusha/searchbutton.dart';
+import 'package:job_app/pages/CustomAppBar.dart';
+import 'package:job_app/pages/carousel.dart';
+import 'package:job_app/pages/companies.dart';
+import 'package:job_app/pages/featured_jobs.dart';
+import 'package:job_app/pages/reccomandjobs.dart';
+import 'package:job_app/pages/searchbutton.dart';
 
 class HomePage extends StatelessWidget {
   final bool isDarkMode;

@@ -44,9 +44,13 @@ dependencies:
   carousel_slider: ^5.0.0
   http: ^0.13.6
   url_launcher: ^6.3.1
+  image_picker: ^0.8.4+4
   flutter_widget_from_html: ^0.16.0
   flutter_animate: ^4.5.2
   dialog_flowtter: ^0.3.3
+  shared_preferences: ^2.2.0
+  firebase_core: ^3.12.1
+  firebase_analytics: ^11.4.4
 
 dev_dependencies:
   flutter_test:
@@ -80,6 +84,10 @@ flutter:
     - assets/tesla.png
     - assets/amazon.png
     - assets/google.png
+    - assets/Otp 1.png
+    - assets/Otp 2.png
+    - assets/Forgot password img.png
+
     - assets/non.jpg
     - assets/dialog_flow_auth.json
     - assets/user.png
