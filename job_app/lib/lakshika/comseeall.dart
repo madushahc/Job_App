@@ -1,74 +1,36 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:job_app/pages/jobdetailscreen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:job_app/lakshika/CompanyDetailPage.dart';
 
-class SeeAllRecomendedJobs extends StatefulWidget {
+class CompanySeeAll extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback onThemeChanged;
-
-  const SeeAllRecomendedJobs({
+  const CompanySeeAll({
     super.key,
     required this.isDarkMode,
     required this.onThemeChanged,
   });
 
   @override
-  State<SeeAllRecomendedJobs> createState() => _SeeAllRecomendedJobsState();
+  State<CompanySeeAll> createState() => _CompanySeeAllState();
 }
 
-class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
+class _CompanySeeAllState extends State<CompanySeeAll> {
   List<dynamic> jobs = [];
   bool isLoading = true;
   String errorMessage = '';
-  List<dynamic> savedJobs = [];
 
   @override
   void initState() {
     super.initState();
     fetchJobs();
-    loadSavedJobs();
-  }
-
-  Future<void> loadSavedJobs() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedJobsJson = prefs.getStringList('savedJobs') ?? [];
-    setState(() {
-      savedJobs = savedJobsJson.map((job) => jsonDecode(job)).toList();
-    });
-  }
-
-  Future<void> saveJob(Map<String, dynamic> job) async {
-    final prefs = await SharedPreferences.getInstance();
-    final jobJson = jsonEncode(job);
-    savedJobs.add(job);
-    await prefs.setStringList(
-        'savedJobs', savedJobs.map((j) => jsonEncode(j)).toList());
-    setState(() {});
-  }
-
-  Future<void> removeJob(Map<String, dynamic> job) async {
-    final prefs = await SharedPreferences.getInstance();
-    savedJobs.removeWhere((j) => j['job_id'] == job['job_id']);
-    await prefs.setStringList(
-        'savedJobs', savedJobs.map((j) => jsonEncode(j)).toList());
-    setState(() {});
-  }
-
-  void _toggleSave(int index) async {
-    final job = jobs[index];
-    if (savedJobs.any((j) => j['job_id'] == job['job_id'])) {
-      await removeJob(job);
-    } else {
-      await saveJob(job);
-    }
   }
 
   Future<void> fetchJobs() async {
     debugPrint("Fetching job details...");
 
-    const String query = "Software Engineer OR Developer OR QA ";
+    const String query = "Jobs";
     const int numPages = 20;
 
     final String url =
@@ -77,28 +39,21 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
 
     final headers = {
       'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-
-      'x-rapidapi-key':
-          'b82235208amsh8a43112a2c5c8e4p19ceb3jsn0ceb21592560', // Replace with actual key
+      'x-rapidapi-key': 'b82235208amsh8a43112a2c5c8e4p19ceb3jsn0ceb21592560',
     };
 
     try {
       final response = await http.get(uri, headers: headers);
-
       debugPrint("Response Status Code: ${response.statusCode}");
-      debugPrint("Response Body: ${response.body}");
 
       if (response.statusCode == 200) {
-        final body = response.body;
-        final json = jsonDecode(body);
-        debugPrint("Fetched Data: $json");
+        final json = jsonDecode(response.body);
 
         if (json['data'] != null && json['data'].isNotEmpty) {
           setState(() {
             jobs = json['data'];
             isLoading = false;
           });
-          debugPrint("Jobs list fetched successfully");
         } else {
           setState(() {
             isLoading = false;
@@ -128,25 +83,25 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
     final Color cardColor = isDarkMode ? Colors.grey[800]! : Colors.white;
     final Color tagBackground =
         isDarkMode ? Colors.blueGrey[800]! : Colors.blue[50]!;
-    final Color tagTextColor =
-        isDarkMode ? Colors.blueAccent : Colors.blueAccent;
+    final Color tagTextColor = Colors.blueAccent;
     final Color locationColor = isDarkMode ? Colors.white70 : Colors.black87;
 
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text("Recommended Jobs")),
+        title: Center(
+          child: Text(
+            "Company",
+            style: TextStyle(color: textColor, fontSize: 20.0),
+          ),
+        ),
       ),
       body: Column(
         children: [
           SizedBox(height: 10.0),
           isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
+              ? const Center(child: CircularProgressIndicator())
               : errorMessage.isNotEmpty
-                  ? Center(
-                      child: Text(errorMessage),
-                    )
+                  ? Center(child: Text(errorMessage))
                   : Expanded(
                       child: ListView.builder(
                         scrollDirection: Axis.vertical,
@@ -155,18 +110,12 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
                         itemCount: jobs.length,
                         itemBuilder: (context, index) {
                           final job = jobs[index];
-                          final title = job["job_title"] ?? "";
-                          final company = job["employer_name"] ?? "";
-                          final logo = job["employer_logo"];
                           final city = job["job_city"] ?? "";
                           final state = job["job_state"] ?? "";
                           final country = job["job_country"] ?? "";
-                          final currency = job["job_salary_currency"] ?? "";
-                          final salary =
-                              job["job_min_salary"]?.toString() ?? "";
-                          final position = job["job_job_title"] ?? "";
+                          final company = job["employer_name"] ?? "";
+                          final logo = job["employer_logo"];
                           final industry = job["employer_company_type"] ?? "";
-                          final type = job["job_employment_type"] ?? "";
 
                           return Padding(
                             padding: EdgeInsets.only(bottom: 15.0),
@@ -175,18 +124,8 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => JobDetailsPage(
-                                      job: job,
-                                      isSaved: savedJobs.any(
-                                          (j) => j['job_id'] == job['job_id']),
-                                      onSaveChanged: (isSaved) {
-                                        if (isSaved) {
-                                          saveJob(job);
-                                        } else {
-                                          removeJob(job);
-                                        }
-                                      },
-                                    ),
+                                    builder: (context) =>
+                                        CompanyDetailPage(companyName: company),
                                   ),
                                 );
                               },
@@ -207,49 +146,66 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
+                                          // Clickable logo
                                           logo != null
-                                              ? Container(
-                                                  width: 50.0,
-                                                  height: 50.0,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    image: DecorationImage(
-                                                      image: NetworkImage(logo),
-                                                      fit: BoxFit.cover,
+                                              ? GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            CompanyDetailPage(
+                                                                companyName:
+                                                                    company),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Container(
+                                                    width: 50.0,
+                                                    height: 50.0,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      image: DecorationImage(
+                                                        image:
+                                                            NetworkImage(logo),
+                                                        fit: BoxFit.cover,
+                                                      ),
                                                     ),
                                                   ),
                                                 )
-                                              : Container(
-                                                  width: 50.0,
-                                                  height: 50.0,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: Colors.grey[300],
-                                                  ),
-                                                  child: Icon(
-                                                    Icons.image_not_supported,
-                                                    size: 30.0,
-                                                    color: Colors.grey[600],
+                                              : GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            CompanyDetailPage(
+                                                                companyName:
+                                                                    company),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: Container(
+                                                    width: 50.0,
+                                                    height: 50.0,
+                                                    decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color: Colors.grey[300],
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.image_not_supported,
+                                                      size: 30.0,
+                                                      color: Colors.grey[600],
+                                                    ),
                                                   ),
                                                 ),
                                           SizedBox(width: 12.0),
+                                          // Job Title & Company
                                           Expanded(
                                             child: Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                if (title.isNotEmpty)
-                                                  Text(
-                                                    title,
-                                                    style: TextStyle(
-                                                      fontSize: 18.0,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: textColor,
-                                                    ),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
                                                 if (company.isNotEmpty)
                                                   Text(
                                                     company,
@@ -263,22 +219,6 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
                                               ],
                                             ),
                                           ),
-                                          IconButton(
-                                            icon: Icon(
-                                              savedJobs.any((j) =>
-                                                      j['job_id'] ==
-                                                      job['job_id'])
-                                                  ? Icons.bookmark_added_rounded
-                                                  : Icons.bookmark_add_outlined,
-                                              size: 30.0,
-                                              color: savedJobs.any((j) =>
-                                                      j['job_id'] ==
-                                                      job['job_id'])
-                                                  ? Colors.blue
-                                                  : Colors.grey,
-                                            ),
-                                            onPressed: () => _toggleSave(index),
-                                          ),
                                         ],
                                       ),
                                       SizedBox(height: 12.0),
@@ -289,12 +229,6 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
                                           if (industry.isNotEmpty)
                                             _buildTag(industry, tagBackground,
                                                 tagTextColor),
-                                          if (type.isNotEmpty)
-                                            _buildTag(type, tagBackground,
-                                                tagTextColor),
-                                          if (position.isNotEmpty)
-                                            _buildTag(position, tagBackground,
-                                                tagTextColor),
                                         ],
                                       ),
                                       SizedBox(height: 10.0),
@@ -302,20 +236,6 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          if (currency.isNotEmpty ||
-                                              salary.isNotEmpty)
-                                            Flexible(
-                                              flex: 1,
-                                              child: Text(
-                                                "$currency $salary",
-                                                style: TextStyle(
-                                                  fontSize: 16.0,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: textColor,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
                                           Flexible(
                                             flex: 2,
                                             child: Row(
