@@ -31,7 +31,7 @@ class _CompanyDetailPageState extends State<CompanyDetailPage> {
 
     final headers = {
       'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-      'x-rapidapi-key': 'b82235208amsh8a43112a2c5c8e4p19ceb3jsn0ceb21592560',
+      'x-rapidapi-key': '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052',
     };
 
     try {
@@ -107,26 +107,8 @@ class _CompanyDetailPageState extends State<CompanyDetailPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Location top-left
-                        Row(
-                          children: [
-                            Icon(Icons.location_on, color: Colors.redAccent),
-                            SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                "${companyData?['job_city'] ?? 'City'}, ${companyData?['job_state'] ?? 'State'}, ${companyData?['job_country'] ?? 'Country'}",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                  color: subtitleColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 20),
+                        SizedBox(height: 10),
 
-                        // Logo centered
                         Center(
                           child: CircleAvatar(
                             radius: 50,
@@ -168,33 +150,23 @@ class _CompanyDetailPageState extends State<CompanyDetailPage> {
                             ),
                           ),
                         SizedBox(height: 30),
-
-                        // Description Section
-                        Text("Description", style: sectionTitleStyle()),
-                        SizedBox(height: 8),
-                        Text(
-                          companyData?['job_description'] ??
-                              "No description available.",
-                          style: sectionContentStyle(),
+                        Row(
+                          children: [
+                            Icon(Icons.location_on, color: Colors.redAccent),
+                            SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                "${companyData?['job_city'] ?? 'City'}, ${companyData?['job_state'] ?? 'State'}, ${companyData?['job_country'] ?? 'Country'}",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: subtitleColor,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-
-                        SizedBox(height: 24),
-
-                        // About Us Section
-                        Text("About Us", style: sectionTitleStyle()),
-                        SizedBox(height: 8),
-                        Text(
-                          (companyData?['job_highlights']?['Qualifications'] !=
-                                  null)
-                              ? (companyData!['job_highlights']
-                                      ['Qualifications'] as List)
-                                  .map((q) => "• $q")
-                                  .join("\n")
-                              : "No About Us info available.",
-                          style: sectionContentStyle(),
-                        ),
-
-                        SizedBox(height: 24),
+                        SizedBox(height: 20),
 
                         // Website Link
                         if ((companyData?['employer_website'] ?? '').isNotEmpty)

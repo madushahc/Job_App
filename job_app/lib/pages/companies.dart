@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:job_app/home_page.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:job_app/lakshika/CompanyDetailPage.dart';
 import 'package:job_app/lakshika/comseeall.dart';
 
 class PopularCompanies extends StatefulWidget {
@@ -39,8 +39,7 @@ class _PopularCompaniesState extends State<PopularCompanies> {
 
     final headers = {
       'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-      'x-rapidapi-key':
-          'b82235208amsh8a43112a2c5c8e4p19ceb3jsn0ceb21592560', // Replace with actual key
+      'x-rapidapi-key': '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052',
     };
 
     try {
@@ -76,14 +75,6 @@ class _PopularCompaniesState extends State<PopularCompanies> {
   @override
   Widget build(BuildContext context) {
     final Color textColor = widget.isDarkMode ? Colors.white : Colors.black87;
-
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (errorMessage.isNotEmpty) {
-      return Center(child: Text(errorMessage));
-    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,7 +118,8 @@ class _PopularCompaniesState extends State<PopularCompanies> {
         ),
         const SizedBox(height: 10.0),
         SizedBox(
-          height: 150.0, // Increased height for better visibility
+          height: 150.0,
+          // Increased height for better visibility
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.only(left: 15.0, bottom: 15.0),
@@ -166,49 +158,60 @@ class CompanyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: Container(
-        margin: const EdgeInsets.all(8.0),
-        width: 100.0,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: FadeInImage(
-                placeholder: AssetImage('assets/non.jpg'), // Fallback image
-                image: logoUrl.startsWith('http')
-                    ? NetworkImage(logoUrl)
-                    : AssetImage(logoUrl) as ImageProvider,
-                fit: BoxFit.cover,
-                width: 80.0,
-                height: 80.0,
-                imageErrorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    'assets/non.jpg', // Fallback image
-                    fit: BoxFit.cover,
-                    width: 80.0,
-                    height: 80.0,
-                  );
-                },
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CompanyDetailPage(companyName: companyName),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 4.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        margin: EdgeInsets.only(right: 8.0, left: 8.0),
+        child: Container(
+          margin: const EdgeInsets.all(8.0),
+          width: 100.0,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(50.0),
+                child: FadeInImage(
+                  placeholder: AssetImage('assets/non.jpg'), // Fallback image
+                  image: logoUrl.startsWith('http')
+                      ? NetworkImage(logoUrl)
+                      : AssetImage(logoUrl) as ImageProvider,
+                  fit: BoxFit.cover,
+                  width: 80.0,
+                  height: 80.0,
+                  imageErrorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/non.jpg', // Fallback image
+                      fit: BoxFit.cover,
+                      width: 80.0,
+                      height: 80.0,
+                    );
+                  },
+                ),
               ),
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              companyName,
-              style: TextStyle(
-                fontSize: 14.0,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white : Colors.black87,
+              const SizedBox(height: 8.0),
+              Text(
+                companyName,
+                style: TextStyle(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                ),
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
