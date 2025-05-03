@@ -3,54 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:job_app/pages/Register_page.dart';
 import 'package:job_app/pages/Forgot_pass_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:job_app/pages/home_page.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.light,
-        primaryColor: Colors.blue,
-        scaffoldBackgroundColor: Colors.blue[50],
-        textTheme: GoogleFonts.poppinsTextTheme(),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: Colors.grey.shade100,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none,
-          ),
-        ),
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: Colors.blue,
-        scaffoldBackgroundColor: Colors.grey[900],
-        textTheme: GoogleFonts.poppinsTextTheme(
-            ThemeData(brightness: Brightness.dark).textTheme),
-        inputDecorationTheme: InputDecorationTheme(
-          filled: true,
-          fillColor: Colors.grey.shade800,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none,
-          ),
-        ),
-      ),
-      themeMode: ThemeMode.system,
-      home: LoginScreen(),
-    );
-  }
-}
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -66,33 +20,64 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    _loadRememberMe(); // Load "Remember Me" state
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
+  // Load "Remember Me" preference from shared_preferences
+  Future<void> _loadRememberMe() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _rememberMe = prefs.getBool('remember_me') ?? false;
+    });
+  }
+
+  // Save "Remember Me" preference to shared_preferences
+  Future<void> _saveRememberMe(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('remember_me', value);
+  }
+
   Future<void> _login() async {
+    print('Login button pressed');
+    if (_emailController.text.trim().isEmpty ||
+        _passwordController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter email and password')),
+      );
+      return;
+    }
+
     setState(() {
       _isLoading = true;
     });
+
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomePage(
-            isDarkMode: false,
-            toggleTheme: (isDark) {},
-          ),
-        ),
-      );
+      print('Firebase login successful');
+      // Save "Remember Me" state
+      await _saveRememberMe(_rememberMe);
+      // Navigation is handled by AuthWrapper
     } on FirebaseAuthException catch (e) {
+      print('FirebaseAuthException: ${e.code} - ${e.message}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? 'Login failed')),
+      );
+    } catch (e) {
+      print('Unexpected error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An unexpected error occurred: $e')),
       );
     } finally {
       setState(() {
@@ -102,12 +87,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _signInWithGoogle() async {
+    print('Google Sign-In button pressed');
     setState(() => _isLoading = true);
     try {
       final GoogleSignIn googleSignIn = GoogleSignIn();
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         setState(() => _isLoading = false);
+        print('Google Sign-In cancelled');
         return;
       }
       final GoogleSignInAuthentication googleAuth =
@@ -120,30 +107,22 @@ class _LoginScreenState extends State<LoginScreen> {
         idToken: googleAuth.idToken,
       );
       await FirebaseAuth.instance.signInWithCredential(credential);
-      if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomePage(
-            isDarkMode: false,
-            toggleTheme: (isDark) {},
-          ),
-        ),
-      );
+      print('Google Sign-In successful');
+      // Save "Remember Me" state
+      await _saveRememberMe(_rememberMe);
+      // Navigation is handled by AuthWrapper
     } on FirebaseAuthException catch (e) {
-      print('FirebaseAuthException: \\${e.code} - \\${e.message}');
+      print('FirebaseAuthException: ${e.code} - ${e.message}');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(
-                'Google sign-in failed: \\${e.message} (code: \\${e.code})')),
+            content:
+                Text('Google sign-in failed: ${e.message} (code: ${e.code})')),
       );
     } catch (e, stack) {
-      print('Google sign-in failed: \\${e.toString()}');
+      print('Google sign-in failed: ${e.toString()}');
       print(stack);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                'Google sign-in failed: \\${e.toString()}\nCheck your SHA-1/SHA-256, google-services.json, and dependencies.')),
+        SnackBar(content: Text('Google sign-in failed: ${e.toString()}')),
       );
     } finally {
       setState(() => _isLoading = false);
@@ -160,15 +139,6 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Align(
-              //   alignment: Alignment.topLeft,
-              //   child: IconButton(
-              //     icon: Icon(Icons.arrow_back, size: 28),
-              //     onPressed: () {
-              //       Navigator.pop(context);
-              //     },
-              //   ),
-              // ),
               SizedBox(height: 40),
               Text(
                 "UPSEES",

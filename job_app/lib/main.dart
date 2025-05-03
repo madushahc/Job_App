@@ -5,15 +5,15 @@ import 'package:flutter/scheduler.dart';
 import 'package:job_app/components/add_post.dart';
 import 'package:job_app/pages/explore_page.dart';
 import 'package:job_app/pages/home_page.dart';
-import 'package:job_app/pages/profile_page.dart';
+import 'package:job_app/pages/profile.dart';
 import 'package:job_app/pages/saved_page.dart';
 import 'package:job_app/themes/app_themes.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:job_app/pages/settings.dart' as Settings;
-import 'package:job_app/chatbot/chatbot_main.dart'; //amantha
+import 'package:job_app/chatbot/chatbot_main.dart';
 import 'package:amicons/amicons.dart';
 import 'package:job_app/pages/login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +30,42 @@ class MyAppLoginWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginScreen(),
+      theme: ThemeData(
+        brightness: Brightness.light,
+        primaryColor: Colors.blue,
+        scaffoldBackgroundColor: Colors.blue[50],
+        textTheme: GoogleFonts.poppinsTextTheme(),
+      ),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primaryColor: Colors.blue,
+        scaffoldBackgroundColor: Colors.grey[900],
+        textTheme: GoogleFonts.poppinsTextTheme(
+            ThemeData(brightness: Brightness.dark).textTheme),
+      ),
+      themeMode: ThemeMode.system,
+      home: AuthWrapper(),
+    );
+  }
+}
+
+// New widget to handle authentication state
+class AuthWrapper extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        if (snapshot.hasData) {
+          // User is logged in, show the main app with navigation bar
+          return MyApp();
+        }
+        // User is not logged in, show login screen
+        return LoginScreen();
+      },
     );
   }
 }
@@ -76,11 +111,7 @@ class _MyAppState extends State<MyApp> {
         isDarkMode: isDarkMode,
         onThemeChanged: () => toggleTheme(!isDarkMode),
       ),
-      ProfilePage(),
-      Settings.Settings(
-        isDarkMode: isDarkMode,
-        onThemeChanged: () => toggleTheme(!isDarkMode),
-      ),
+      ProfileScreen(),
     ];
 
     return MaterialApp(
@@ -108,6 +139,7 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
+// Rest of the HomeScreen code remains the same
 class HomeScreen extends StatelessWidget {
   final bool isDarkMode;
   final ValueChanged<bool> toggleTheme;
@@ -129,7 +161,7 @@ class HomeScreen extends StatelessWidget {
       Amicons.iconly_home,
       Amicons.flaticon_world_sharp,
       Amicons.iconly_bookmark,
-      Amicons.iconly_profile
+      Amicons.iconly_profile,
     ];
 
     List<IconData> selectedIcons = [
@@ -178,9 +210,6 @@ class HomeScreen extends StatelessWidget {
           onTap: onTabTapped,
         ),
       ),
-
-      //Amantha
-      //add floting action button and it navigate to chatbot
       floatingActionButton: currentIndex == 0 || currentIndex == 1
           ? Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -209,7 +238,6 @@ class HomeScreen extends StatelessWidget {
                   FloatingActionButton(
                     onPressed: () {
                       print("UPSEES BOT is Working ");
-
                       Navigator.push(
                         context,
                         MaterialPageRoute(
