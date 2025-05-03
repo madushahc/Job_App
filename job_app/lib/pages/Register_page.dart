@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:job_app/pages/login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() {
   runApp(MyApp());
@@ -53,6 +54,54 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   bool isAgreed = false;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _register() async {
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registration successful! Please log in.')),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Registration failed')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +148,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               SizedBox(height: 20),
               TextField(
+                controller: _nameController,
                 decoration: InputDecoration(
                   hintText: "Name",
                   hintStyle: TextStyle(color: Colors.grey.shade400),
@@ -106,6 +156,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               SizedBox(height: 15),
               TextField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   hintText: "Enter email",
                   hintStyle: TextStyle(color: Colors.grey.shade400),
@@ -113,6 +164,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               SizedBox(height: 15),
               TextField(
+                controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   hintText: "Password",
@@ -121,6 +173,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               SizedBox(height: 15),
               TextField(
+                controller: _confirmPasswordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   hintText: "Confirm Password",
@@ -158,7 +211,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               SizedBox(height: 10),
               ElevatedButton(
-                onPressed: isAgreed ? () {} : null,
+                onPressed: isAgreed && !_isLoading ? _register : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue.shade900,
                   shape: RoundedRectangleBorder(
@@ -166,14 +219,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   minimumSize: Size(double.infinity, 50),
                 ),
-                child: Text(
-                  "Create Account",
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                child: _isLoading
+                    ? CircularProgressIndicator(color: Colors.white)
+                    : Text(
+                        "Create Account",
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
               ),
               SizedBox(height: 30),
               Row(
