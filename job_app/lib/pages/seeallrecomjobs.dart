@@ -77,7 +77,9 @@ class _SeeAllRecomendedJobsState extends State<SeeAllRecomendedJobs> {
 
     final headers = {
       'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-      'x-rapidapi-key': '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052',
+
+      'x-rapidapi-key':
+          '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052', // Replace with actual key
     };
 
     try {

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:job_app/home_page.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:job_app/lakshika/CompanyDetailPage.dart';
+import 'package:job_app/lakshika/comseeall.dart';
 
 class PopularCompanies extends StatefulWidget {
   final bool isDarkMode;
@@ -16,13 +19,58 @@ class PopularCompanies extends StatefulWidget {
 }
 
 class _PopularCompaniesState extends State<PopularCompanies> {
-  // Dummy data for companies
-  final List<Map<String, String>> companies = [
-    {"name": "Microsoft", "logo": "assets/microsoft.png"},
-    {"name": "Google", "logo": "assets/google.png"},
-    {"name": "Amazon", "logo": "assets/amazon.png"},
-    {"name": "Tesla", "logo": "assets/tesla.png"},
-  ];
+  List<dynamic> jobs = [];
+  bool isLoading = true;
+  String errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchJobs();
+  }
+
+  Future<void> fetchJobs() async {
+    const String query = "jobs";
+    const int numPages = 1;
+
+    final String url =
+        'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
+    final Uri uri = Uri.parse(url);
+
+    final headers = {
+      'x-rapidapi-host': 'jsearch.p.rapidapi.com',
+      'x-rapidapi-key': '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052',
+    };
+
+    try {
+      final response = await http.get(uri, headers: headers);
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        if (json['data'] != null && json['data'].isNotEmpty) {
+          setState(() {
+            jobs = json['data'];
+            isLoading = false;
+          });
+        } else {
+          setState(() {
+            isLoading = false;
+            errorMessage = "No jobs found";
+          });
+        }
+      } else {
+        setState(() {
+          isLoading = false;
+          errorMessage = "Failed to fetch job details: ${response.statusCode}";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        errorMessage = "Error fetching job details: $e";
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +79,6 @@ class _PopularCompaniesState extends State<PopularCompanies> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Section title with "See All"
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Row(
@@ -42,7 +89,7 @@ class _PopularCompaniesState extends State<PopularCompanies> {
                 style: TextStyle(
                   fontSize: 20.0,
                   fontWeight: FontWeight.bold,
-                  color: textColor, // Dark mode support
+                  color: textColor,
                 ),
               ),
               Material(
@@ -50,7 +97,10 @@ class _PopularCompaniesState extends State<PopularCompanies> {
                 child: InkWell(
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => HomePage1()),
+                    MaterialPageRoute(
+                        builder: (context) => CompanySeeAll(
+                            isDarkMode: widget.isDarkMode,
+                            onThemeChanged: widget.onThemeChanged)),
                   ),
                   borderRadius: BorderRadius.circular(4.0),
                   child: const Padding(
@@ -66,20 +116,25 @@ class _PopularCompaniesState extends State<PopularCompanies> {
             ],
           ),
         ),
-
         const SizedBox(height: 10.0),
-
-        // Horizontal list of companies
         SizedBox(
-          height: 110.0, // Ensure proper alignment
+          height: 150.0,
+          // Increased height for better visibility
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.only(left: 16.0),
-            itemCount: companies.length,
+            padding: const EdgeInsets.only(left: 15.0, bottom: 15.0),
+            itemCount: jobs.length,
             itemBuilder: (context, index) {
-              return _buildCompanyCard(
-                companies[index]["name"]!,
-                companies[index]["logo"]!,
+              final job = jobs[index];
+              final company = job["employer_name"] ?? "";
+              final logo = job["employer_logo"]?.isNotEmpty == true
+                  ? job["employer_logo"]
+                  : 'assets/non.jpg'; // Fallback to local asset
+
+              return CompanyCard(
+                companyName: company,
+                logoUrl: logo,
+                isDarkMode: widget.isDarkMode,
               );
             },
           ),
@@ -87,45 +142,77 @@ class _PopularCompaniesState extends State<PopularCompanies> {
       ],
     );
   }
+}
 
-  // Company Card Widget with Dark Mode support
-  Widget _buildCompanyCard(String name, String logoPath) {
-    return Container(
-      margin: const EdgeInsets.only(right: 15.0),
-      width: 90.0, // Fixed width for each item
-      child: Column(
-        children: [
-          Container(
-            width: 60.0,
-            height: 60.0,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: AssetImage(logoPath),
-                fit: BoxFit.cover,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: widget.isDarkMode
-                      ? Colors.white24 // Softer shadow in dark mode
-                      : Colors.grey.withOpacity(0.3),
-                  blurRadius: 5.0,
-                  spreadRadius: 2.0,
+class CompanyCard extends StatelessWidget {
+  final String companyName;
+  final String logoUrl;
+  final bool isDarkMode;
+
+  const CompanyCard({
+    super.key,
+    required this.companyName,
+    required this.logoUrl,
+    required this.isDarkMode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => CompanyDetailPage(companyName: companyName),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 4.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        margin: EdgeInsets.only(right: 8.0, left: 8.0),
+        child: Container(
+          margin: const EdgeInsets.all(8.0),
+          width: 100.0,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(50.0),
+                child: FadeInImage(
+                  placeholder: AssetImage('assets/non.jpg'), // Fallback image
+                  image: logoUrl.startsWith('http')
+                      ? NetworkImage(logoUrl)
+                      : AssetImage(logoUrl) as ImageProvider,
+                  fit: BoxFit.cover,
+                  width: 80.0,
+                  height: 80.0,
+                  imageErrorBuilder: (context, error, stackTrace) {
+                    return Image.asset(
+                      'assets/non.jpg', // Fallback image
+                      fit: BoxFit.cover,
+                      width: 80.0,
+                      height: 80.0,
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                companyName,
+                style: TextStyle(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                ),
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-          const SizedBox(height: 6.0),
-          Text(
-            name,
-            style: TextStyle(
-              fontSize: 14.0,
-              fontWeight: FontWeight.bold,
-              color: widget.isDarkMode ? Colors.white : Colors.black87,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+        ),
       ),
     );
   }
