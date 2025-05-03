@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:job_app/home_page.dart';
 import 'package:job_app/pages/CustomMenuBar.dart';
 import 'package:job_app/pages/CustomNotification.dart';
+import 'package:job_app/pages/profile.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isDarkMode;
@@ -83,7 +84,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const HomePage1(),
+                      builder: (context) => ProfileScreen(),
                     ),
                   );
                 },
