@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:job_app/home_page.dart';
 import 'package:job_app/pages/settings.dart';
 import 'package:job_app/pages/login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart' hide Settings;
 
-class CustomMenubar extends StatelessWidget {
+class CustomMenubar extends StatefulWidget {
   final bool isDarkMode;
   final VoidCallback onThemeChanged;
 
@@ -15,14 +17,63 @@ class CustomMenubar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final Color textColor = isDarkMode ? Colors.white : Colors.black;
-    final Color iconColor = isDarkMode ? Colors.white : Colors.black45;
+  _CustomMenubarState createState() => _CustomMenubarState();
+}
 
-    final Color tileColor = isDarkMode ? Colors.black : Colors.white;
+class _CustomMenubarState extends State<CustomMenubar> {
+  String? _userName;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserName();
+  }
+
+  Future<void> _fetchUserName() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final docSnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        if (docSnapshot.exists) {
+          setState(() {
+            _userName = docSnapshot.data()?['name'] ?? 'User';
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            _userName = 'User';
+            _isLoading = false;
+          });
+        }
+      } else {
+        setState(() {
+          _userName = 'Guest';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _userName = 'Error';
+        _isLoading = false;
+      });
+      print('Error fetching user name: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Color textColor = widget.isDarkMode ? Colors.white : Colors.black;
+    final Color iconColor = widget.isDarkMode ? Colors.white : Colors.black45;
+
+    final Color tileColor = widget.isDarkMode ? Colors.black : Colors.white;
 
     final Color highlightColor =
-        isDarkMode ? Colors.blue[300]! : Colors.blue[700]!;
+        widget.isDarkMode ? Colors.blue[300]! : Colors.blue[700]!;
 
     return Scaffold(
       appBar: AppBar(
@@ -60,10 +111,9 @@ class CustomMenubar extends StatelessWidget {
           ],
         ),
       ),
-      backgroundColor: isDarkMode ? Colors.black : Colors.white,
+      backgroundColor: widget.isDarkMode ? Colors.black : Colors.white,
       body: Column(
         children: [
-          // Profile Picture & Name
           Center(
             child: Column(
               children: [
@@ -80,14 +130,16 @@ class CustomMenubar extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Text(
-                  "Andrew Russell",
-                  style: TextStyle(
-                    color: textColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 23.0,
-                  ),
-                ),
+                _isLoading
+                    ? CircularProgressIndicator()
+                    : Text(
+                        _userName ?? "User",
+                        style: TextStyle(
+                          color: textColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 23.0,
+                        ),
+                      ),
                 GestureDetector(
                   onTap: () => Navigator.push(
                     context,
@@ -101,10 +153,7 @@ class CustomMenubar extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(height: 50),
-
-          // Menu Items
           _buildMenuItem(
             context,
             icon: Icons.description_outlined,
@@ -133,8 +182,8 @@ class CustomMenubar extends StatelessWidget {
               context,
               MaterialPageRoute(
                 builder: (context) => Settings(
-                  isDarkMode: isDarkMode,
-                  onThemeChanged: onThemeChanged,
+                  isDarkMode: widget.isDarkMode,
+                  onThemeChanged: widget.onThemeChanged,
                 ),
               ),
             ),

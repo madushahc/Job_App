@@ -85,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => HomePage(
-            isDarkMode: false, // You may want to pass the actual theme state
+            isDarkMode: false,
             toggleTheme: (isDark) {},
           ),
         ),

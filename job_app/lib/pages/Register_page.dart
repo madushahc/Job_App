@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:job_app/pages/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() {
   runApp(MyApp());
@@ -81,10 +82,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _isLoading = true;
     });
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .set({
+        'name': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'createdAt': Timestamp.now(),
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Registration successful! Please log in.')),
       );
