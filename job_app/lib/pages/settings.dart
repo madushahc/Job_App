@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:job_app/pages/CustomNotification.dart';
+import 'package:job_app/pages/profile.dart';
 
 /// The [AppTheme] defines light and dark themes for the app.
 abstract final class AppTheme {
@@ -36,7 +37,14 @@ class _SettingsState extends State<Settings> {
             _buildSettingsItem(
               icon: Icons.person_outline,
               title: "Account",
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfileScreen(),
+                  ),
+                );
+              },
             ),
             _buildSettingsItem(
               icon: Icons.notifications_outlined,

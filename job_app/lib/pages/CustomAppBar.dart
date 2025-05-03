@@ -8,11 +8,13 @@ import 'package:job_app/pages/profile.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isDarkMode;
   final VoidCallback onThemeChanged;
+  final String userName;
 
   const CustomAppBar({
     super.key,
     required this.isDarkMode,
     required this.onThemeChanged,
+    required this.userName,
   });
 
   @override
@@ -89,7 +91,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   );
                 },
                 child: Text(
-                  "Andrew Russell",
+                  userName,
                   style: TextStyle(
                     color: textColor,
                     fontSize: 18.0,
