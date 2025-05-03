@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "346561229065",
+    "project_id": "job-app-77d65",
+    "storage_bucket": "job-app-77d65.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:346561229065:android:674e99db622fe4cfa6e3d8",
+        "android_client_info": {
+          "package_name": "com.example.job_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "346561229065-d5ibc4o80pg71n47b43jv7bktcgldhv6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.job_app",
+            "certificate_hash": "c0fdb5ff84dc39e2b10109c259da5f4805094db5"
+          }
+        },
+        {
+          "client_id": "346561229065-ppfuoaml17753gsgi04jhv856r3lc1d9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD0gAHxnP-ZLkxXufTyAMRejjtbb-m2mJ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "346561229065-ppfuoaml17753gsgi04jhv856r3lc1d9.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "346561229065-usda3tm86744b6015i4pvarpib344j1r.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.jobApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,6 +2,7 @@ import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 import 'package:job_app/home_page.dart';
 import 'package:job_app/pages/settings.dart';
+import 'package:job_app/pages/login_page.dart';
 
 class CustomMenubar extends StatelessWidget {
   final bool isDarkMode;
@@ -145,7 +146,7 @@ class CustomMenubar extends StatelessWidget {
             label: "Logout",
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const HomePage1()),
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
             ),
             color: Colors.red,
           ),

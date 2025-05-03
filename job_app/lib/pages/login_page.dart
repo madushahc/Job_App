@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:job_app/pages/Register_page.dart';
 import 'package:job_app/pages/Forgot_pass_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:job_app/pages/home_page.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 void main() {
   runApp(MyApp());
@@ -58,6 +61,94 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _rememberMe = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(
+            isDarkMode: false, // You may want to pass the actual theme state
+            toggleTheme: (isDark) {},
+          ),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Login failed')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() => _isLoading = true);
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        setState(() => _isLoading = false);
+        return;
+      }
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      if (googleAuth.accessToken == null || googleAuth.idToken == null) {
+        throw Exception('Missing Google Auth Token');
+      }
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      await FirebaseAuth.instance.signInWithCredential(credential);
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(
+            isDarkMode: false,
+            toggleTheme: (isDark) {},
+          ),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      print('FirebaseAuthException: \\${e.code} - \\${e.message}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                'Google sign-in failed: \\${e.message} (code: \\${e.code})')),
+      );
+    } catch (e, stack) {
+      print('Google sign-in failed: \\${e.toString()}');
+      print(stack);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(
+                'Google sign-in failed: \\${e.toString()}\nCheck your SHA-1/SHA-256, google-services.json, and dependencies.')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,6 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 20),
               TextField(
+                controller: _emailController,
                 decoration: InputDecoration(
                   hintText: "Enter email",
                   hintStyle: TextStyle(color: Colors.grey.shade400),
@@ -120,6 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 15),
               TextField(
+                controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
                   hintText: "Password",
@@ -163,7 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 15),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: _isLoading ? null : _login,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue.shade900,
                   shape: RoundedRectangleBorder(
@@ -171,13 +264,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   minimumSize: Size(double.infinity, 50),
                 ),
-                child: Text(
-                  "Log In",
-                  style: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
+                child: _isLoading
+                    ? CircularProgressIndicator(color: Colors.white)
+                    : Text(
+                        "Log In",
+                        style: GoogleFonts.poppins(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
               ),
               SizedBox(height: 30),
               Row(
@@ -196,7 +291,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               SizedBox(height: 15),
               InkWell(
-                onTap: () {},
+                onTap: _isLoading ? null : _signInWithGoogle,
                 child: Container(
                   width: 50,
                   height: 50,

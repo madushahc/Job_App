@@ -13,13 +13,26 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:job_app/pages/settings.dart' as Settings;
 import 'package:job_app/chatbot/chatbot_main.dart'; //amantha
 import 'package:amicons/amicons.dart';
+import 'package:job_app/pages/login_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(const MyAppLoginWrapper());
+}
+
+class MyAppLoginWrapper extends StatelessWidget {
+  const MyAppLoginWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: LoginScreen(),
+    );
+  }
 }
 
 class MyApp extends StatefulWidget {
