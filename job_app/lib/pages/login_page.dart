@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:job_app/pages/Register_page.dart';
-import 'package:job_app/pages/Forgot_pass_page.dart';
+import 'package:job_app/pages/Register_page.dart' hide MyApp;
+import 'package:job_app/pages/Forgot_pass_page.dart' hide MyApp;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:job_app/main.dart' show MyApp;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -68,7 +69,14 @@ class _LoginScreenState extends State<LoginScreen> {
       print('Firebase login successful');
       // Save "Remember Me" state
       await _saveRememberMe(_rememberMe);
-      // Navigation is handled by AuthWrapper
+      // Navigate to MyApp and replace the current screen
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const MyApp()),
+          (route) => false,
+        );
+      }
     } on FirebaseAuthException catch (e) {
       print('FirebaseAuthException: ${e.code} - ${e.message}');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -110,7 +118,14 @@ class _LoginScreenState extends State<LoginScreen> {
       print('Google Sign-In successful');
       // Save "Remember Me" state
       await _saveRememberMe(_rememberMe);
-      // Navigation is handled by AuthWrapper
+      // Navigate to MyApp and replace the current screen
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const MyApp()),
+          (route) => false,
+        );
+      }
     } on FirebaseAuthException catch (e) {
       print('FirebaseAuthException: ${e.code} - ${e.message}');
       ScaffoldMessenger.of(context).showSnackBar(
