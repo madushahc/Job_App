@@ -1,5 +1,7 @@
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
+import 'package:job_app/pages/profile.dart';
+import 'package:job_app/pages/profile_page.dart';
 import 'package:job_app/test.dart';
 import 'package:job_app/pages/settings.dart';
 import 'package:job_app/pages/login_page.dart';
@@ -22,6 +24,7 @@ class CustomMenubar extends StatefulWidget {
 
 class _CustomMenubarState extends State<CustomMenubar> {
   String? _userName;
+  String? _userProfileImage;
   bool _isLoading = true;
 
   @override
@@ -42,11 +45,13 @@ class _CustomMenubarState extends State<CustomMenubar> {
         if (docSnapshot.exists) {
           setState(() {
             _userName = docSnapshot.data()?['name'] ?? 'User';
+            _userProfileImage = docSnapshot.data()?['profileImage'];
             _isLoading = false;
           });
         } else {
           setState(() {
             _userName = 'User';
+            _userProfileImage = null;
             _isLoading = false;
           });
         }
@@ -121,10 +126,13 @@ class _CustomMenubarState extends State<CustomMenubar> {
                   margin: const EdgeInsets.only(top: 15.0),
                   width: 100,
                   height: 100,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                      image: AssetImage('assets/profile.jpeg'),
+                      image: _userProfileImage != null
+                          ? NetworkImage(_userProfileImage!)
+                          : const AssetImage('assets/default_profile.png')
+                              as ImageProvider,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -143,7 +151,7 @@ class _CustomMenubarState extends State<CustomMenubar> {
                 GestureDetector(
                   onTap: () => Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const HomePage1()),
+                    MaterialPageRoute(builder: (context) => ProfileScreen()),
                   ),
                   child: Text(
                     "View Profile",

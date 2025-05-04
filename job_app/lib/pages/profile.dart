@@ -7,6 +7,13 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 
 class ProfileScreen extends StatefulWidget {
+  final bool showBackButton;
+
+  const ProfileScreen({
+    super.key,
+    this.showBackButton = true,
+  });
+
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
@@ -238,16 +245,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.arrow_back, size: 28),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                          SizedBox(width: 10),
-                          Text(
+                      if (widget.showBackButton)
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.arrow_back, size: 28),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              "Complete Your Profile",
+                              style: GoogleFonts.poppins(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.color,
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Text(
                             "Complete Your Profile",
                             style: GoogleFonts.poppins(
                               fontSize: 20,
@@ -256,8 +280,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   Theme.of(context).textTheme.bodyLarge?.color,
                             ),
                           ),
-                        ],
-                      ),
+                        ),
                       SizedBox(height: 20),
                       _buildProfileSection(
                         "Profile Info",
