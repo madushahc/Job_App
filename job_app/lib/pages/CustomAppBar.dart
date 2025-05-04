@@ -9,12 +9,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isDarkMode;
   final VoidCallback onThemeChanged;
   final String userName;
+  final String? userProfileImage;
 
   const CustomAppBar({
     super.key,
     required this.isDarkMode,
     required this.onThemeChanged,
     required this.userName,
+    this.userProfileImage,
   });
 
   @override
@@ -59,16 +61,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             icon: Icon(Icons.menu_rounded, color: iconColor),
             iconSize: 35.0,
           ),
-          Container(
-            width: 50.0,
-            height: 50.0,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                image: AssetImage('assets/profile.jpeg'),
-                fit: BoxFit.cover,
-              ),
-            ),
+          CircleAvatar(
+            backgroundImage: userProfileImage != null
+                ? NetworkImage(userProfileImage!)
+                : AssetImage('assets/default_profile.png') as ImageProvider,
+            radius: 25.0,
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
