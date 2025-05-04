@@ -158,21 +158,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
           .child('profile_images')
           .child('$userId.jpg');
 
-      final uploadTask = storageRef.putFile(
-        File(_profileImagePath!),
-        SettableMetadata(contentType: 'image/jpeg'),
+      // Create metadata
+      final metadata = SettableMetadata(
+        contentType: 'image/jpeg',
+        customMetadata: {'userId': userId},
       );
 
-      final snapshot = await uploadTask;
-
-      final downloadUrl = await snapshot.ref.getDownloadURL();
-
-      setState(() {
-        _profileImageUrl = downloadUrl;
-        _isUploading = false;
+      // Upload file with metadata
+      await storageRef
+          .putFile(
+        File(_profileImagePath!),
+        metadata,
+      )
+          .whenComplete(() async {
+        try {
+          // Get download URL only after upload is complete
+          final downloadUrl = await storageRef.getDownloadURL();
+          setState(() {
+            _profileImageUrl = downloadUrl;
+            _isUploading = false;
+          });
+          print('Profile image uploaded successfully: $_profileImageUrl');
+        } catch (urlError) {
+          print('Error getting download URL: $urlError');
+          setState(() {
+            _isUploading = false;
+            _errorMessage = "Error getting download URL: $urlError";
+          });
+          throw urlError;
+        }
       });
-
-      print('Profile image uploaded successfully: $_profileImageUrl');
     } catch (e) {
       setState(() {
         _isUploading = false;
