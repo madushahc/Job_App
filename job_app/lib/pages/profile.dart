@@ -3,7 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloudinary_public/cloudinary_public.dart';
+import 'package:job_app/config/cloudinary_config.dart';
 import 'dart:io';
 
 class ProfileScreen extends StatefulWidget {
@@ -160,41 +161,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     try {
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('profile_images')
-          .child('$userId.jpg');
-
-      // Create metadata
-      final metadata = SettableMetadata(
-        contentType: 'image/jpeg',
-        customMetadata: {'userId': userId},
+      // Create Cloudinary instance
+      final cloudinary = CloudinaryPublic(
+        CloudinaryConfig.cloudName,
+        CloudinaryConfig.uploadPreset,
+        cache: false,
       );
 
-      // Upload file with metadata
-      await storageRef
-          .putFile(
-        File(_profileImagePath!),
-        metadata,
-      )
-          .whenComplete(() async {
-        try {
-          // Get download URL only after upload is complete
-          final downloadUrl = await storageRef.getDownloadURL();
-          setState(() {
-            _profileImageUrl = downloadUrl;
-            _isUploading = false;
-          });
-          print('Profile image uploaded successfully: $_profileImageUrl');
-        } catch (urlError) {
-          print('Error getting download URL: $urlError');
-          setState(() {
-            _isUploading = false;
-            _errorMessage = "Error getting download URL: $urlError";
-          });
-          throw urlError;
-        }
+      // Upload to Cloudinary
+      final response = await cloudinary.uploadFile(
+        CloudinaryFile.fromFile(
+          _profileImagePath!,
+          resourceType: CloudinaryResourceType.Image,
+          folder: 'profile_images',
+          tags: ['profile', userId],
+        ),
+      );
+
+      // Get the secure URL from the response
+      setState(() {
+        _profileImageUrl = response.secureUrl;
+        _isUploading = false;
       });
+      print('Profile image uploaded successfully: $_profileImageUrl');
     } catch (e) {
       setState(() {
         _isUploading = false;

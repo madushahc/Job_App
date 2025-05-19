@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:job_app/pages/onboarding.dart';
 import 'firebase_options.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:job_app/components/add_post.dart';
@@ -14,6 +15,7 @@ import 'package:job_app/chatbot/chatbot_main.dart';
 import 'package:amicons/amicons.dart';
 import 'package:job_app/pages/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,21 +52,46 @@ class MyAppLoginWrapper extends StatelessWidget {
 }
 
 // New widget to handle authentication state
-class AuthWrapper extends StatelessWidget {
+class AuthWrapper extends StatefulWidget {
+  @override
+  State<AuthWrapper> createState() => _AuthWrapperState();
+}
+
+class _AuthWrapperState extends State<AuthWrapper> {
+  Future<bool> checkOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('onboardingComplete') ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+      builder: (context, authSnapshot) {
+        if (authSnapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         }
-        if (snapshot.hasData) {
-          // User is logged in, show the main app with navigation bar
-          return MyApp();
-        }
-        // User is not logged in, show login screen
-        return LoginScreen();
+
+        return FutureBuilder<bool>(
+          future: checkOnboarding(),
+          builder: (context, onboardingSnapshot) {
+            if (onboardingSnapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+
+            // Show onboarding if it hasn't been completed
+            if (!onboardingSnapshot.data!) {
+              return OnboardingScreen();
+            }
+
+            if (authSnapshot.hasData) {
+              // User is logged in, show the main app with navigation bar
+              return MyApp();
+            }
+            // User is not logged in, show login screen
+            return LoginScreen();
+          },
+        );
       },
     );
   }
