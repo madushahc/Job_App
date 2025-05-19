@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:job_app/pages/login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class OnboardingScreen extends StatefulWidget {
   @override
@@ -11,9 +14,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
+  bool isLastPage = false;
+
   List<OnboardingContent> contents = [
     OnboardingContent(
-      title: "welcome to UPSEES",
+      title: "Welcome to UPSEES",
       image: "assets/onboard3.png",
       description: "Find your Dream job here",
     ),
@@ -41,6 +46,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               onPageChanged: (int page) {
                 setState(() {
                   _currentPage = page;
+                  isLastPage = contents.length - 1 == page;
                 });
               },
               itemBuilder: (context, index) {
@@ -77,22 +83,52 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               },
             ),
           ),
-          Row(
-            children: [
-              //Skip button
-              TextButton(
-                onPressed: () {},
-                child: const Text("Skip"),
-              ),
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 10,
+            ),
+            child: isLastPage
+                ? getStarted(context)
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      //Skip button
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.blueGrey,
+                        ),
+                        onPressed: () =>
+                            _pageController.jumpToPage(contents.length - 1),
+                        child: const Text("Skip"),
+                      ),
 
-              //Indicator
+                      //Indicator
+                      SmoothPageIndicator(
+                        controller: _pageController,
+                        count: contents.length,
+                        onDotClicked: (index) => _pageController.animateToPage(
+                            index,
+                            duration: Duration(microseconds: 600),
+                            curve: Curves.easeIn),
+                        effect: WormEffect(
+                            dotHeight: 12,
+                            dotWidth: 12,
+                            activeDotColor: Colors.blue),
+                      ),
 
-              //Next button
-              TextButton(
-                onPressed: () {},
-                child: const Text("Next"),
-              ),
-            ],
+                      //Next button
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.blue,
+                        ),
+                        onPressed: () => _pageController.nextPage(
+                            duration: const Duration(microseconds: 600),
+                            curve: Curves.easeIn),
+                        child: const Text("Next"),
+                      ),
+                    ],
+                  ),
           ),
           SizedBox(height: 40),
         ],
@@ -123,4 +159,33 @@ class OnboardingContent {
     required this.image,
     required this.description,
   });
+}
+
+Widget getStarted(BuildContext context) {
+  return Container(
+    width: MediaQuery.of(context).size.width * .9,
+    height: 55,
+    child: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+      onPressed: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      },
+      child: Text(
+        "Get Started",
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+  );
 }
