@@ -24,6 +24,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String _userName = "Loading...";
+  String? _userProfileImage;
   bool _isLoading = true;
 
   @override
@@ -44,6 +45,7 @@ class _HomePageState extends State<HomePage> {
         if (docSnapshot.exists) {
           setState(() {
             _userName = docSnapshot.data()?['name'] ?? 'User';
+            _userProfileImage = docSnapshot.data()?['profileImageUrl'];
             _isLoading = false;
           });
         } else {
@@ -83,6 +85,7 @@ class _HomePageState extends State<HomePage> {
                 isDarkMode: widget.isDarkMode,
                 onThemeChanged: () => widget.toggleTheme(!widget.isDarkMode),
                 userName: _userName,
+                userProfileImage: _userProfileImage,
               ),
         body: SingleChildScrollView(
           child: Column(
