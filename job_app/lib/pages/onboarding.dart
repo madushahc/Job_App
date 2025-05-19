@@ -172,7 +172,11 @@ Widget getStarted(BuildContext context) {
           borderRadius: BorderRadius.circular(10),
         ),
       ),
-      onPressed: () {
+      onPressed: () async {
+        // Save that onboarding is complete
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('onboardingComplete', true);
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => LoginScreen()),

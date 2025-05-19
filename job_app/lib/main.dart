@@ -69,27 +69,29 @@ class _AuthWrapperState extends State<AuthWrapper> {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, authSnapshot) {
         if (authSnapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
+        // If user is logged in, show main app directly
+        if (authSnapshot.hasData) {
+          return const MyApp();
+        }
+
+        // If user is not logged in, check if they need to see onboarding
         return FutureBuilder<bool>(
           future: checkOnboarding(),
           builder: (context, onboardingSnapshot) {
             if (onboardingSnapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
 
-            // Show onboarding if it hasn't been completed
+            // Show onboarding if it hasn't been completed and user is not logged in
             if (!onboardingSnapshot.data!) {
               return OnboardingScreen();
             }
 
-            if (authSnapshot.hasData) {
-              // User is logged in, show the main app with navigation bar
-              return MyApp();
-            }
-            // User is not logged in, show login screen
-            return LoginScreen();
+            // If onboarding is complete but user is not logged in, show login screen
+            return const LoginScreen();
           },
         );
       },
