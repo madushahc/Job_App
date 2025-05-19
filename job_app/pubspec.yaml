@@ -58,6 +58,8 @@ dependencies:
   firebase_storage: ^12.4.5
   intl: ^0.19.0
   smooth_page_indicator: ^1.2.1
+  cloudinary_flutter: ^1.2.0
+  cloudinary_public: ^0.21.0
 
 dev_dependencies:
   flutter_test:
