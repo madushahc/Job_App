@@ -223,7 +223,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: Colors.blue[50],
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _errorMessage != null
@@ -280,7 +280,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               children: [
                                 CircleAvatar(
                                   radius: 40,
-                                  backgroundColor: Colors.grey[300],
+                                  backgroundColor: Colors.grey,
                                   backgroundImage: _getProfileImage(),
                                   child: _isUploading
                                       ? CircularProgressIndicator()
@@ -313,6 +313,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     decoration: InputDecoration(
                                       labelText: "Name",
                                       border: OutlineInputBorder(),
+                                      filled: true,
+                                      fillColor: Colors.white,
                                     ),
                                   ),
                                   SizedBox(height: 10),
@@ -321,6 +323,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     decoration: InputDecoration(
                                       labelText: "Email",
                                       border: OutlineInputBorder(),
+                                      filled: true,
+                                      fillColor: Colors.white,
                                     ),
                                   ),
                                   SizedBox(height: 10),
@@ -329,6 +333,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     decoration: InputDecoration(
                                       labelText: "Phone Number",
                                       border: OutlineInputBorder(),
+                                      filled: true,
+                                      fillColor: Colors.white,
                                     ),
                                   ),
                                 ],
@@ -389,7 +395,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Container(
         padding: EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: Theme.of(context).inputDecorationTheme.fillColor,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
@@ -423,6 +429,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         decoration: InputDecoration(
           labelText: "About me",
           border: OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.white,
         ),
       ),
     );
@@ -437,6 +445,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         decoration: InputDecoration(
           labelText: "Work Experience",
           border: OutlineInputBorder(),
+          filled: true,
+          fillColor: Colors.white,
         ),
       ),
     );
@@ -468,6 +478,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             decoration: InputDecoration(
               labelText: "Add a skill",
               border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
             ),
             onSubmitted: (value) {
               if (value.isNotEmpty) {
@@ -506,6 +518,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             decoration: InputDecoration(
               labelText: "Add a language",
               border: OutlineInputBorder(),
+              filled: true,
+              fillColor: Colors.white,
             ),
             onSubmitted: (value) {
               if (value.isNotEmpty) {
