@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../config/cloudinary_config.dart';
 import 'package:job_app/lakshika/CompanyDetailPage.dart';
 
 class CompanySeeAll extends StatefulWidget {
@@ -37,13 +38,9 @@ class _CompanySeeAllState extends State<CompanySeeAll> {
         'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
     final Uri uri = Uri.parse(url);
 
-    final headers = {
-      'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-      'x-rapidapi-key': '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052',
-    };
-
     try {
-      final response = await http.get(uri, headers: headers);
+      final response =
+          await http.get(uri, headers: RapidApiConfig.getHeaders());
       debugPrint("Response Status Code: ${response.statusCode}");
 
       if (response.statusCode == 200) {
