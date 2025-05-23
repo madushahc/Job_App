@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+import '../config/cloudinary_config.dart';
 
 class CompanyDetailPage extends StatefulWidget {
   final String companyName;
@@ -29,13 +30,9 @@ class _CompanyDetailPageState extends State<CompanyDetailPage> {
       'https://jsearch.p.rapidapi.com/search?query=${Uri.encodeComponent(widget.companyName)}&page=1&num_pages=1&country=us&date_posted=all',
     );
 
-    final headers = {
-      'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-      'x-rapidapi-key': '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052',
-    };
-
     try {
-      final response = await http.get(url, headers: headers);
+      final response =
+          await http.get(url, headers: RapidApiConfig.getHeaders());
       if (response.statusCode == 200) {
         final json = jsonDecode(response.body);
         if (json['data'] != null && json['data'].isNotEmpty) {

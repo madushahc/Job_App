@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../config/cloudinary_config.dart';
 import 'package:job_app/pages/jobdetailscreen.dart';
 import 'package:job_app/pages/seeallrecomjobs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -74,13 +75,9 @@ class _RecomendedJobsState extends State<RecomendedJobs> {
         'https://jsearch.p.rapidapi.com/search?query=$query&num_pages=$numPages';
     final Uri uri = Uri.parse(url);
 
-    final headers = {
-      'x-rapidapi-host': 'jsearch.p.rapidapi.com',
-      'x-rapidapi-key': '48fea61a3fmsh72dc8d6f1b29208p1cd121jsn5b7f40a19052',
-    };
-
     try {
-      final response = await http.get(uri, headers: headers);
+      final response =
+          await http.get(uri, headers: RapidApiConfig.getHeaders());
 
       if (response.statusCode == 200) {
         final body = response.body;
