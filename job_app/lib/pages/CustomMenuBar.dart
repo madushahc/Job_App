@@ -45,7 +45,7 @@ class _CustomMenubarState extends State<CustomMenubar> {
         if (docSnapshot.exists) {
           setState(() {
             _userName = docSnapshot.data()?['name'] ?? 'User';
-            _userProfileImage = docSnapshot.data()?['profileImage'];
+            _userProfileImage = docSnapshot.data()?['profileImageUrl'];
             _isLoading = false;
           });
         } else {
@@ -149,10 +149,14 @@ class _CustomMenubarState extends State<CustomMenubar> {
                         ),
                       ),
                 GestureDetector(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProfileScreen()),
-                  ),
+                  onTap: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ProfileScreen()),
+                    );
+                    // Refresh data when returning from profile screen
+                    _fetchUserName();
+                  },
                   child: Text(
                     "View Profile",
                     style: TextStyle(color: highlightColor),

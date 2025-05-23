@@ -1,11 +1,11 @@
 class CloudinaryConfig {
   static const String cloudName =
-      'dcaragpha'; // Replace with your Cloudinary cloud name
+      'dcaragpha'; 
   static const String uploadPreset =
-      'job_app_profile_upload'; // Replace with your upload preset
-  static const String apiKey = '566776567789896'; // Replace with your API Key
+      'job_app_profile_upload'; 
+  static const String apiKey = '566776567789896'; 
   static const String apiSecret =
-      'iI5FWAI0cKZFJyFQspeuDZc4pzs'; // Replace with your API Secret
+      'iI5FWAI0cKZFJyFQspeuDZc4pzs'; 
 }
 
 class RapidApiConfig {
