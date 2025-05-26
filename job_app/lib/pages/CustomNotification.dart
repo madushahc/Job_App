@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:amicons/amicons.dart';
 
 class CustomNotification extends StatelessWidget {
   final bool isDarkMode;
@@ -210,7 +211,7 @@ class CustomNotification extends StatelessWidget {
                                 ? Icons.thumb_up
                                 : notification['type'] == 'dislike'
                                     ? Icons.thumb_down
-                                    : Icons.comment,
+                                    : Amicons.flaticon_comment_alt_rounded,
                             color: Colors.white,
                           ),
                         ),
