@@ -4,6 +4,8 @@ import 'package:job_app/test.dart';
 import 'package:job_app/pages/CustomMenuBar.dart';
 import 'package:job_app/pages/CustomNotification.dart';
 import 'package:job_app/pages/profile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isDarkMode;
@@ -18,6 +20,77 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.userName,
     this.userProfileImage,
   });
+
+  Widget _buildNotificationIcon(Color iconColor) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return IconButton(
+        onPressed: null,
+        icon: Icon(Amicons.iconly_notification_3_sharp,
+            size: 35.0, color: iconColor),
+      );
+    }
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('notifications')
+          .where('read', isEqualTo: false)
+          .snapshots(),
+      builder: (context, snapshot) {
+        int unreadCount = 0;
+        if (snapshot.hasData) {
+          unreadCount = snapshot.data!.docs.length;
+        }
+
+        return Stack(
+          children: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CustomNotification(
+                      isDarkMode: isDarkMode,
+                      onThemeChanged: onThemeChanged,
+                    ),
+                  ),
+                );
+              },
+              icon: Icon(Amicons.iconly_notification_3_sharp,
+                  size: 35.0, color: iconColor),
+            ),
+            if (unreadCount > 0)
+              Positioned(
+                right: 0,
+                top: 0,
+                child: Container(
+                  padding: EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                  constraints: BoxConstraints(
+                    minWidth: 20,
+                    minHeight: 20,
+                  ),
+                  child: Text(
+                    unreadCount > 99 ? '99+' : unreadCount.toString(),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,21 +171,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               ),
             ],
           ),
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CustomNotification(
-                    isDarkMode: isDarkMode,
-                    onThemeChanged: onThemeChanged,
-                  ),
-                ),
-              );
-            },
-            icon: Icon(Amicons.iconly_notification_3_sharp,
-                size: 35.0, color: iconColor),
-          ),
+          _buildNotificationIcon(iconColor),
         ],
       ),
     );
