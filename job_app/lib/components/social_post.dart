@@ -25,6 +25,7 @@ class _SocialPostState extends State<SocialPost> {
     final postRef = FirebaseFirestore.instance.collection('posts').doc(postId);
 
     try {
+      bool shouldNotify = false;
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final postDoc = await transaction.get(postRef);
         if (!postDoc.exists) return;
@@ -42,6 +43,7 @@ class _SocialPostState extends State<SocialPost> {
             likes.add(user.uid);
             // Remove from dislikes if present
             dislikes.remove(user.uid);
+            shouldNotify = true;
           }
         }
 
@@ -50,6 +52,15 @@ class _SocialPostState extends State<SocialPost> {
           'dislikes': dislikes,
         });
       });
+
+      if (shouldNotify) {
+        // Only send notification when adding a like for the first time
+        try {
+          await _sendNotification(postId, 'like');
+        } catch (e) {
+          print('Error sending like notification: $e');
+        }
+      }
     } catch (e) {
       print('Error toggling like: $e');
     }
@@ -67,6 +78,7 @@ class _SocialPostState extends State<SocialPost> {
     final postRef = FirebaseFirestore.instance.collection('posts').doc(postId);
 
     try {
+      bool shouldNotify = false;
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final postDoc = await transaction.get(postRef);
         if (!postDoc.exists) return;
@@ -84,6 +96,7 @@ class _SocialPostState extends State<SocialPost> {
             dislikes.add(user.uid);
             // Remove from likes if present
             likes.remove(user.uid);
+            shouldNotify = true;
           }
         }
 
@@ -92,6 +105,15 @@ class _SocialPostState extends State<SocialPost> {
           'dislikes': dislikes,
         });
       });
+
+      if (shouldNotify) {
+        // Only send notification when adding a dislike for the first time
+        try {
+          await _sendNotification(postId, 'dislike');
+        } catch (e) {
+          print('Error sending dislike notification: $e');
+        }
+      }
     } catch (e) {
       print('Error toggling dislike: $e');
     }
@@ -161,6 +183,9 @@ class _SocialPostState extends State<SocialPost> {
                       'userProfileImage': userProfileImage,
                       'createdAt': Timestamp.now(),
                     });
+
+                    // Send notification for the new comment
+                    await _sendNotification(postId, 'comment');
                     Navigator.pop(context);
                   } catch (e) {
                     print('Error adding comment: $e');
@@ -419,6 +444,82 @@ class _SocialPostState extends State<SocialPost> {
     );
   }
 
+  Future<void> _sendNotification(String postId, String action) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        print('Cannot send notification: No user logged in');
+        return;
+      }
+
+      // Get post data to find post owner
+      final postDoc = await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(postId)
+          .get();
+
+      if (!postDoc.exists) {
+        print('Cannot send notification: Post does not exist');
+        return;
+      }
+
+      final postData = postDoc.data() as Map<String, dynamic>;
+      final postOwnerId = postData['userId'];
+
+      if (postOwnerId == null) {
+        print('Cannot send notification: Post has no owner ID');
+        return;
+      }
+
+      // Don't notify if user is interacting with their own post
+      if (user.uid == postOwnerId) {
+        print('Skipping notification: User interacting with own post');
+        return;
+      }
+
+      // Get user's data for notification
+      String userName = 'Someone';
+      try {
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        if (userDoc.exists) {
+          final userData = userDoc.data() as Map<String, dynamic>;
+          userName = userData['name'] ??
+              userData['fullName'] ??
+              user.displayName ??
+              'Someone';
+        }
+      } catch (e) {
+        print('Error getting user data for notification: $e');
+        // Continue with default userName
+      }
+
+      // Create notification
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(postOwnerId)
+          .collection('notifications')
+          .add({
+        'type': action,
+        'postId': postId,
+        'fromUserId': user.uid,
+        'fromUserName': userName,
+        'createdAt': Timestamp.now(),
+        'read': false,
+        'postTitle':
+            postData['title'] ?? 'A post', // Include post title if available
+      });
+
+      print(
+          'Notification successfully sent: $action from $userName to user $postOwnerId');
+    } catch (e) {
+      print('Error sending notification: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
@@ -543,7 +644,9 @@ class _SocialPostState extends State<SocialPost> {
                                   Amicons.remix_thumb_up,
                                   color: isLiked ? Colors.blue : textColor,
                                 ),
-                                onPressed: () => _toggleLike(postId, isLiked),
+                                onPressed: () async {
+                                  await _toggleLike(postId, isLiked);
+                                },
                               ),
                               Text(
                                 likes.length.toString(),
@@ -563,8 +666,9 @@ class _SocialPostState extends State<SocialPost> {
                                   Amicons.lucide_thumbs_down,
                                   color: isDisliked ? Colors.red : textColor,
                                 ),
-                                onPressed: () =>
-                                    _toggleDislike(postId, isDisliked),
+                                onPressed: () async {
+                                  await _toggleDislike(postId, isDisliked);
+                                },
                               ),
                               Text(
                                 dislikes.length.toString(),
