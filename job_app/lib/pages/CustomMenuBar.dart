@@ -1,6 +1,7 @@
 import 'package:amicons/amicons.dart';
 import 'package:flutter/material.dart';
 import 'package:job_app/pages/profile.dart';
+import 'package:job_app/pages/personalinfo.dart';
 import 'package:job_app/pages/profile_page.dart';
 import 'package:job_app/test.dart';
 import 'package:job_app/pages/settings.dart';
@@ -168,21 +169,11 @@ class _CustomMenubarState extends State<CustomMenubar> {
           const SizedBox(height: 50),
           _buildMenuItem(
             context,
-            icon: Icons.description_outlined,
-            label: "Applications",
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const HomePage1()),
-            ),
-            color: textColor,
-          ),
-          _buildMenuItem(
-            context,
             icon: Icons.info_outline,
             label: "Personal Information",
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const HomePage1()),
+              MaterialPageRoute(builder: (context) => const PersonalInfoPage()),
             ),
             color: textColor,
           ),
