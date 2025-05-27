@@ -41,7 +41,9 @@ class _SettingsState extends State<Settings> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ProfileScreen(),
+                    builder: (context) => ProfileScreen(
+                      isDarkMode: widget.isDarkMode,
+                    ),
                   ),
                 );
               },

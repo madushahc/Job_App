@@ -153,7 +153,9 @@ class _CustomMenubarState extends State<CustomMenubar> {
                   onTap: () async {
                     await Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => ProfileScreen()),
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              ProfileScreen(isDarkMode: widget.isDarkMode)),
                     );
                     // Refresh data when returning from profile screen
                     _fetchUserName();
@@ -173,7 +175,10 @@ class _CustomMenubarState extends State<CustomMenubar> {
             label: "Personal Information",
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const PersonalInfoPage()),
+              MaterialPageRoute(
+                builder: (context) =>
+                    PersonalInfoPage(isDarkMode: widget.isDarkMode),
+              ),
             ),
             color: textColor,
           ),

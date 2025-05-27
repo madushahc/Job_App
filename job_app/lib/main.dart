@@ -140,7 +140,7 @@ class _MyAppState extends State<MyApp> {
         isDarkMode: isDarkMode,
         onThemeChanged: () => toggleTheme(!isDarkMode),
       ),
-      ProfileScreen(showBackButton: false),
+      ProfileScreen(showBackButton: false, isDarkMode: isDarkMode),
     ];
 
     return MaterialApp(
