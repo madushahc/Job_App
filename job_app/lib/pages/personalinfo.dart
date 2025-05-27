@@ -4,7 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class PersonalInfoPage extends StatefulWidget {
-  const PersonalInfoPage({super.key});
+  final bool isDarkMode;
+
+  const PersonalInfoPage({
+    super.key,
+    required this.isDarkMode,
+  });
 
   @override
   State<PersonalInfoPage> createState() => _PersonalInfoPageState();
@@ -60,6 +65,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
 
   Widget _buildTextField(String label, TextEditingController controller,
       {int maxLines = 1}) {
+    final isDark = widget.isDarkMode;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Column(
@@ -69,7 +75,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
             label,
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey[600],
+              color: isDark ? Colors.grey[400] : Colors.grey[600],
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -78,15 +84,17 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
             padding: const EdgeInsets.all(12),
             width: double.infinity,
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: isDark ? Colors.grey[800] : Colors.grey[100],
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey[300]!),
+              border: Border.all(
+                color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
+              ),
             ),
             child: Text(
               controller.text,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
-                color: Colors.black87,
+                color: isDark ? Colors.white : Colors.black87,
               ),
               maxLines: maxLines,
             ),
@@ -104,17 +112,17 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
       );
     }
     return Scaffold(
-      backgroundColor: Colors.blue[50],
+      backgroundColor: widget.isDarkMode ? Colors.black : Colors.blue[50],
       appBar: AppBar(
         title: Text(
           'Personal Information',
           style: GoogleFonts.poppins(
             fontWeight: FontWeight.normal,
-            color: Colors.black,
+            color: widget.isDarkMode ? Colors.white : Colors.black,
           ),
         ),
-        backgroundColor: Colors.blue[50],
-        foregroundColor: Colors.black,
+        backgroundColor: widget.isDarkMode ? Colors.grey[900] : Colors.blue[50],
+        foregroundColor: widget.isDarkMode ? Colors.white : Colors.black,
       ),
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
@@ -171,6 +179,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    color: widget.isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -183,6 +192,7 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    color: widget.isDarkMode ? Colors.white : Colors.black,
                   ),
                 ),
                 const SizedBox(height: 16),

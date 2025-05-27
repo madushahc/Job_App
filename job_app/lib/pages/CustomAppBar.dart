@@ -156,7 +156,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ProfileScreen(),
+                      builder: (context) =>
+                          ProfileScreen(isDarkMode: isDarkMode),
                     ),
                   );
                 },

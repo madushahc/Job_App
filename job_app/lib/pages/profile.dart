@@ -9,10 +9,12 @@ import 'dart:io';
 
 class ProfileScreen extends StatefulWidget {
   final bool showBackButton;
+  final bool isDarkMode;
 
   const ProfileScreen({
     super.key,
     this.showBackButton = true,
+    required this.isDarkMode,
   });
 
   @override
@@ -223,11 +225,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue[50],
+      backgroundColor: widget.isDarkMode ? Colors.grey[900] : Colors.blue[50],
       body: _isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                color: widget.isDarkMode ? Colors.white : Colors.blue,
+              ),
+            )
           : _errorMessage != null
-              ? Center(child: Text("Error: $_errorMessage"))
+              ? Center(
+                  child: Text(
+                  "Error: $_errorMessage",
+                  style: TextStyle(
+                    color: widget.isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ))
               : SingleChildScrollView(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
@@ -308,35 +320,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Expanded(
                               child: Column(
                                 children: [
-                                  TextField(
-                                    controller: _nameController,
-                                    decoration: InputDecoration(
-                                      labelText: "Name",
-                                      border: OutlineInputBorder(),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                    ),
-                                  ),
+                                  _buildTextField("Name", _nameController),
                                   SizedBox(height: 10),
-                                  TextField(
-                                    controller: _emailController,
-                                    decoration: InputDecoration(
-                                      labelText: "Email",
-                                      border: OutlineInputBorder(),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                    ),
-                                  ),
+                                  _buildTextField("Email", _emailController),
                                   SizedBox(height: 10),
-                                  TextField(
-                                    controller: _phoneController,
-                                    decoration: InputDecoration(
-                                      labelText: "Phone Number",
-                                      border: OutlineInputBorder(),
-                                      filled: true,
-                                      fillColor: Colors.white,
-                                    ),
-                                  ),
+                                  _buildTextField(
+                                      "Phone Number", _phoneController),
                                 ],
                               ),
                             ),
@@ -357,7 +346,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: ElevatedButton(
                           onPressed: _saveUserData,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue[300],
+                            backgroundColor: widget.isDarkMode
+                                ? Colors.blue[700]
+                                : Colors.blue[300],
+                            foregroundColor: widget.isDarkMode
+                                ? Colors.white
+                                : Colors.black87,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -390,13 +384,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Widget _buildTextField(String label, TextEditingController controller,
+      {int maxLines = 1}) {
+    return TextField(
+      controller: controller,
+      maxLines: maxLines,
+      style: TextStyle(
+        color: widget.isDarkMode ? Colors.white : Colors.black87,
+      ),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(
+          color: widget.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        filled: true,
+        fillColor: widget.isDarkMode ? Colors.grey[700] : Colors.white,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: widget.isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(
+            color: Colors.blue,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildProfileSection(String title, IconData icon, {Widget? child}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Container(
         padding: EdgeInsets.all(15),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: widget.isDarkMode ? Colors.grey[800] : Colors.white,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Column(
@@ -427,11 +455,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: TextField(
         controller: _aboutMeController,
         maxLines: 3,
+        style: TextStyle(
+          color: widget.isDarkMode ? Colors.white : Colors.black87,
+        ),
         decoration: InputDecoration(
           labelText: "About me",
-          border: OutlineInputBorder(),
+          labelStyle: TextStyle(
+            color: widget.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: widget.isDarkMode ? Colors.grey[700] : Colors.white,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: widget.isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.blue,
+            ),
+          ),
         ),
       ),
     );
@@ -443,11 +491,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: TextField(
         controller: _workExperienceController,
         maxLines: 3,
+        style: TextStyle(
+          color: widget.isDarkMode ? Colors.white : Colors.black87,
+        ),
         decoration: InputDecoration(
           labelText: "Work Experience",
-          border: OutlineInputBorder(),
+          labelStyle: TextStyle(
+            color: widget.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: widget.isDarkMode ? Colors.grey[700] : Colors.white,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: widget.isDarkMode ? Colors.grey[600]! : Colors.grey[300]!,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(
+              color: Colors.blue,
+            ),
+          ),
         ),
       ),
     );
@@ -464,8 +532,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             runSpacing: 4.0,
             children: _skills.map((skill) {
               return Chip(
-                label: Text(skill),
-                backgroundColor: Colors.blue[200],
+                label: Text(
+                  skill,
+                  style: TextStyle(
+                    color: widget.isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ),
+                backgroundColor:
+                    widget.isDarkMode ? Colors.blue[800] : Colors.blue[200],
                 onDeleted: () {
                   setState(() {
                     _skills.remove(skill);
@@ -504,8 +578,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             runSpacing: 4.0,
             children: _languages.map((language) {
               return Chip(
-                label: Text(language),
-                backgroundColor: Colors.blue[200],
+                label: Text(
+                  language,
+                  style: TextStyle(
+                    color: widget.isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ),
+                backgroundColor:
+                    widget.isDarkMode ? Colors.blue[800] : Colors.blue[200],
                 onDeleted: () {
                   setState(() {
                     _languages.remove(language);
