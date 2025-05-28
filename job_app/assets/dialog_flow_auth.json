@@ -1,13 +1,1 @@
-{
-  "type": "service_account",
-  "project_id": "chat-with-us-uph9",
-  "private_key_id": "e5075a488911bef017680606f4990fedecbb3fa3",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCqIj7+HAhfkotj\nnVF/JMCt1qNETxP2Q14XMXazZdatwKLrw65yrmOqcK/o/4Vnqd7pg8Xa211eOiL5\nnP+tI/NXfWv0mpk1WrHQWbfg6Yl+Mr1B3jo7Z0luSie4xtUj1Nlr+uvd7L6j1kdg\n0/Wv3NzWxpU4cvhiO6i2xo4zBA6k7yWfiDJhOZkw3kM7fxxfO0u0nfg6U664tgao\nd91Ybb95MKqDIURbIbS1Ll+gV6ODU+CwlzwaETTrHfXP/WBpXZV/E+szifquwyPT\nboqczzDSRJA2Jx5hINz1kLayPg3a179bgOFDqvYiCHjRD64BjqAG1nV3rbouhKno\nFNNOOIy9AgMBAAECggEAFRhV8zAKob8L5XgWKMun0GYyrD+Z3AkSW5HYg/n2mmiu\nSslikfmphfKe/Sbhpa7cYtvh5ncYppxSxdx/nzo76/czMYsRwBnUvl7Be/O5BprH\n+KjTU5ZE9pXfQvv0ZZL4unjMUiIOqUXiZ9EgP4QFJeRNkEhBH/0BuFf6Pb0dC7of\nZWIr7C0jFF3f2z7/sYCR2DiMR92WjfTuCSaNDrZVAVCJ4QSk7+3mQ1XSuTKEasGb\n+oFr9pkgCe+QCwwt0Aa+hR3pErPY6AA+kqOuSsJaZ9NbvB18MRWqEe14lbVf5Sye\nfF1qKkx9qSv+i+C1IMsJVDhy87Uer/mm0CowaV6DAQKBgQDiXPlVWKs8Oj/Aalq3\nxg1I41LvpgQOPJsV8owpXtdDw+Uru4ar3Pf1p4Aiz13K/wLo8C/NFfGDvNUt7WWL\nOxmKkNTv3ixOehQ40dldRjUNYWRCHAuwVvLJ30oz4pLsIseXyAnmkod5QEgP6ICl\nBlH4ZchHCx/AsgXHFyWRnojM3QKBgQDAaKDXqrRRMlIDQRRsJLu8WaEWDMknxskX\n9junNSY2aTIxCtEJIeS/NBzQaTnvyiC+aThqSjeNS8jQHrIETdColIJ0+1ytSB3L\nGLLTCNSSpM1KZq+dNuuAi0uJEyajn5mVvtEwgm3mrqnMhwvib7ucgAvgSiZwycua\nvb+q7EVRYQKBgQCWPND7dTtJYPu5EJ2fRWLB0qbUCeK9NDpWacHfH2RORLFQwkjS\nvnkQYRipgeoldfWPdwKy4nKGVglDT0HLE/GSxyedAF91wo6zW4wh3RwPAmnRet3D\nLyI7G+ka4LFU6oyAT7NKhkxGDIUHke/4F2bGL3+qr1ZmxYESL2mu6YKwPQKBgQC2\nTOvIKzb5j6Hg73J4HD278XgMukSE6XVyvJw8isEP4I/ro4H3EyP2fVuno2t/ZJWt\nk2geXP9RYrJ7bfng1hGTCFKqn9ZpX+DKozYbeUxfPMI9chmF7Zkoi9IfqAN+GCOe\nm9L8ETgrzuWWoYWDH7Y0S6X09oyBZNECZjIJsh7jQQKBgGjuCYSXlBVjKz814VSH\n+6bOFACt9iKUfizadruNLg4aHcIEHrSKjGueuWr0Vj6948IiG8jb5lcWIlK8ySQp\nW9T2ZZbEMT1G14gXr7/7MNrEm6GKGJmefD/hT/2VH3qsuOZllOv28NmmrI0dJfAc\n1SUSvf00xLxGRR594i/MSijE\n-----END PRIVATE KEY-----\n",
-  "client_email": "us-agent@chat-with-us-uph9.iam.gserviceaccount.com",
-  "client_id": "103640735717929525214",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/us-agent%40chat-with-us-uph9.iam.gserviceaccount.com",
-  "universe_domain": "googleapis.com"
-}
+//this File has remove Becase of Credetiontel issue an Restriction
