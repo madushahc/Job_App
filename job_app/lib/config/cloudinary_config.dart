@@ -11,7 +11,7 @@ class CloudinaryConfig {
 class RapidApiConfig {
   static const String host = 'jsearch.p.rapidapi.com';
   static const String apiKey =
-      'a825ec3b19mshdcd90db93522f9ap1d88cfjsnca9e11a06a34';
+      '45e6271b49msh02064a264dbc139p15c911jsnb36740740f5b';
 
   static Map<String, String> getHeaders() {
     return {
