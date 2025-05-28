@@ -145,7 +145,7 @@ class _MyAppState extends State<MyApp> {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'UPSEES',
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       darkTheme: AppTheme.dark.copyWith(
         textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
