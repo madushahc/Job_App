@@ -76,7 +76,7 @@ A **modern, feature-rich mobile application** built using **Flutter** and **Fire
 
 1. Clone the repo:
    ```bash
-   git clone https://github.com/yourusername/upsees-job-app.git
+   git clone https://github.com/madushahc/Job_App.git
 
 
 ## ⭐️ Show your support
